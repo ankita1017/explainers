@@ -298,6 +298,20 @@ code {
   line-height: 1.7;
   margin-bottom: 0.5rem;
 }
+.article-footer ul.sources-list {
+  font-family: var(--font-sans);
+  font-size: 0.75rem; color: var(--text-tertiary);
+  line-height: 1.7;
+  margin: 0 0 1.25rem 1.25rem;
+  padding: 0;
+  list-style: disc;
+}
+.article-footer ul.sources-list li { margin-bottom: 0.4rem; }
+.article-footer .byline {
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  margin-bottom: 0;
+}
 .article-footer a { color: var(--text-secondary); text-decoration: none; }
 .article-footer a:hover { text-decoration: underline; }
 
@@ -1124,11 +1138,14 @@ code {
 </div>
 
 <footer class="article-footer">
-  <p style="font-size: 0.85rem; margin-bottom: 0.75rem;">
+  <ul class="sources-list">
+    <li>Primary sources: the <a href="https://modelcontextprotocol.io/specification/2025-11-25">Model Context Protocol specification</a>, IBM's <a href="https://www.ibm.com/think/topics/model-context-protocol">Model Context Protocol primer</a> and <a href="https://www.ibm.com/think/topics/rest-apis">REST APIs primer</a>, and Roy Fielding's 2000 doctoral dissertation on <a href="https://ics.uci.edu/~fielding/pubs/dissertation/top.htm">REST</a>.</li>
+    <li>Comparisons drew on <a href="https://workos.com/blog/mcp-vs-rest">WorkOS</a>, <a href="https://blaxel.ai/blog/mcp-vs-api-guide">Blaxel</a>, and <a href="https://mcpmanager.ai/blog/mcp-vs-api/">MCP Manager</a>.</li>
+    <li>The CLI-analogy framing and the "raw dog the API" security angle drew on this <a href="https://www.reddit.com/r/mcp/comments/1lqqfif/whats_the_point_of_mcp/">r/mcp thread</a>.</li>
+    <li>Built as a distill.pub-style interactive using the <a href="https://github.com/analyticalmonk/explain-this">explain-this</a> Claude Code plugin by <a href="https://github.com/analyticalmonk">analyticalmonk</a>.</li>
+  </ul>
+  <p class="byline" style="font-size: 0.85rem;">
     By <a href="https://www.linkedin.com/in/ankitamathur10/"><strong>Ankita Mathur</strong></a> · <a href="https://medium.com/@anki-mat">Medium</a> · <a href="https://x.com/AnkitaM1094">Twitter</a>
-  </p>
-  <p>
-    Primary sources: the <a href="https://modelcontextprotocol.io/specification/2025-11-25">Model Context Protocol specification</a>, IBM's <a href="https://www.ibm.com/think/topics/model-context-protocol">Model Context Protocol primer</a> and <a href="https://www.ibm.com/think/topics/rest-apis">REST APIs primer</a>, and Roy Fielding's 2000 doctoral dissertation on <a href="https://ics.uci.edu/~fielding/pubs/dissertation/top.htm">REST</a>. Comparisons drew on <a href="https://workos.com/blog/mcp-vs-rest">WorkOS</a>, <a href="https://blaxel.ai/blog/mcp-vs-api-guide">Blaxel</a>, and <a href="https://mcpmanager.ai/blog/mcp-vs-api/">MCP Manager</a>. The CLI-analogy framing and the "raw dog the API" security angle drew on this <a href="https://www.reddit.com/r/mcp/comments/1lqqfif/whats_the_point_of_mcp/">r/mcp thread</a>. Built as a distill.pub-style interactive using the <a href="https://github.com/analyticalmonk/explain-this">explain-this</a> Claude Code plugin by <a href="https://github.com/analyticalmonk">analyticalmonk</a>.
   </p>
 </footer>
 
