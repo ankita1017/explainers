@@ -41,7 +41,7 @@ h1 {
   margin-bottom: 1rem;
 }
 .tagline {
-  font-size: 1.15rem; font-weight: 400; font-style: italic;
+  font-size: 1.15rem; font-weight: 400;
   color: var(--text-secondary); line-height: 1.55;
   margin-bottom: 3rem;
   padding-bottom: 2rem;
@@ -62,7 +62,7 @@ h1 {
   font-size: 1.5rem; font-weight: 600;
   line-height: 1.3;
   margin-bottom: 0.35rem;
-  color: var(--link);
+  color: var(--text);
 }
 .explainer-item p {
   font-family: var(--font-sans);
@@ -79,6 +79,53 @@ h1 {
   letter-spacing: 0.06em;
   margin-top: 0.5rem;
   display: block;
+}
+
+/* Featured tile with visual background */
+.explainer-item.featured {
+  border: none;
+  border-radius: 12px;
+  padding: 0;
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.explainer-item.featured:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+.explainer-item.featured a {
+  color: white;
+  background: linear-gradient(135deg, #4C1D95 0%, #7C3AED 45%, #2563EB 100%);
+  padding: 2.4rem 2rem;
+  display: block;
+  position: relative;
+}
+.explainer-item.featured a::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 85% 15%, rgba(255,255,255,0.15) 0%, transparent 40%),
+    radial-gradient(circle at 15% 85%, rgba(255,255,255,0.08) 0%, transparent 40%);
+  pointer-events: none;
+}
+.explainer-item.featured a > * { position: relative; }
+.explainer-item.featured h2 {
+  color: white;
+  margin-bottom: 0.6rem;
+  font-size: 1.75rem;
+  line-height: 1.25;
+}
+.explainer-item.featured p {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+.explainer-item.featured .meta {
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 1rem;
 }
 footer {
   margin-top: 4rem;
@@ -97,7 +144,7 @@ footer a { color: var(--text-secondary); }
 <p class="tagline">Interactive explainers on things I have been figuring out. Written in plain terms for people who build with these ideas.</p>
 
 <ul class="explainer-list">
-  <li class="explainer-item">
+  <li class="explainer-item featured">
     <a href="./mcp-vs-rest/">
       <h2>What Actually Changes When You Put MCP in Front of Your REST API?</h2>
       <p>Less integration code for you to maintain, and less work for the model to figure out the call at runtime. The tool arrives already described.</p>
