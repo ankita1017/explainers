@@ -738,7 +738,7 @@ code {
     <header class="article-header">
       <div class="overline">An interactive explainer</div>
       <h1>What Actually Changes When You Put MCP in Front of Your REST API?</h1>
-      <p class="article-subtitle">Less integration code for you to maintain, and less work for the model to figure out the call at runtime. The tool arrives already described.</p>
+      <p class="article-subtitle">Compared to a REST API, less integration code for developers to write and maintain, because the MCP provider ships the tools already described.</p>
       <div class="article-meta-header">
         <span>July 2026</span>
         <span>10 min read</span>
@@ -748,39 +748,43 @@ code {
 
     <section id="section-morning">
       <p class="lead">
-        <strong>What is the difference between a REST API and MCP?</strong> It should be a simple question with a jargon-free answer. Instead you read "an API for AI agents," "REST is stateless by design," or analogies trying to dumb it down for you: "MCPs are like USB ports, one universal connector for every tool." All technically correct, but none useful, decorating the definition of an MCP without explaining what changes mechanically when you build an agentic system on it.
+        <strong>What is the difference between REST API and MCP?</strong> It should be a simple question with a jargon-free answer. <strong>Instead you read things like "an API for AI agents", "REST is stateless by design", or analogies trying to dumb it down for you: "MCPs are like USB ports, one universal connector for every tool". All technically correct, decorative definitions,</strong> but not explaining what changes mechanically when you build an agentic system using an MCP.
       </p>
       <p>
-        Maybe you are on the other side of this. You have wrapped your data platform in an MCP server and you are telling customers to use this new thing. Do they need it? And can you clearly tell them why, in a sentence that is not an analogy? I was not able to, so I built this for myself.
+        Maybe you are on the other side of this. You have wrapped your data platform in an MCP server and you are telling customers to use this new thing. Do they need it? And can you clearly tell them why? I was not able to, so I built this explainer for myself.
       </p>
 
       <div class="callout">
-        <strong>TL;DR:</strong> With a REST API, you build and maintain the integration code for every tool your agent uses, updating it each time the API changes. With MCP, the provider ships a description of each tool (what it does, what inputs it takes) in a format the LLM can read at runtime, so you write less integration code of your own.
+        <strong>TL;DR:</strong> With a REST API, you build and maintain the integration code for every tool your agent uses, changing it each time the API changes. With MCP, the provider ships a description of each tool (what it does, what inputs it takes) in a format the LLM can read at runtime, so you write less integration code of your own.
       </div>
 
       <h3>What is a "tool"?</h3>
       <p>
-        In an agentic system, a tool is any action the agent can take on the outside world: fetch a calendar, query a database, send an email, look up a deal. Each one is a function the model can call, wrapped with a description of what it does and what inputs it needs. Unlike traditional code, the agent does not run tools on a fixed schedule; it reads the descriptions and decides, mid-task, which to call and in what order.
+        In an agentic system, a tool is any action the agent can take beyond its own reasoning, out in the systems where your data and services actually live: fetch a calendar, query a database, send an email, look up a deal. Each one is a function the model can call, wrapped with a description of what it does and what inputs it needs. Unlike traditional code, the agent does not run tools on a fixed schedule; it reads the descriptions and decides, mid-task, which to call and in what order.
       </p>
       <p>
-        Take a simple one: give an agent a <code>get_weather</code> tool and ask "should I bike to work?" It calls the tool, reads the forecast, and answers. Ask "what's a good recipe for tonight?" and it ignores the tool entirely, since nothing in the question needs it. Same tool, available both times; the agent decides when it is relevant. That runtime choice is what makes it agentic.
+        A simple example: give an agent a <code>get_weather</code> tool and ask "should I cycle to work?" It calls the tool, reads the forecast, and answers. Ask "what's a good recipe for chocolate brownie?" and it ignores the tool entirely, since nothing in the question needs it. Same tool, available both times; the agent decides when it is relevant. That runtime choice is what makes it agentic.
       </p>
       <p>
-        So far, no MCP needed. You could write <code>get_weather</code> yourself, and the agent would use it the same way. For a single tool you own, that is reasonable. So where does MCP come in?
+        So far, no MCP needed. You could write <code>get_weather</code> yourself, and the agent would use it the same way. For a single tool that you own, it is a reasonable request. So where does MCP come in?
       </p>
       <p>
         The moment the tool is not yours, MCP earns its place. If the weather service ships an MCP server, you point your agent at it and it discovers what tools are available, instead of you reading their API docs, writing the call, and updating your code every time they change a field.
+      </p>
+      <p>
+        For some use cases, writing the tool yourself is still the simpler choice. If you only need one stable call from a large external service, a single hand-written tool can be less code than depending on a whole server, and easier on the model too.
       </p>
 
       <h3>Let the LLM read the docs and figure it out?</h3>
       <p>
         You could argue the LLM can just read the API docs and work out the call itself. Fair, but now it does that every single time, at runtime. Every call spends tokens and context re-deriving what a tool description would have told it. That is load you are paying for on every request, to work out something a tool description would have handed it up front.
+
       </p>
       <p>
-        "MCP is a design choice." You can understand that now, instead of it being a performative line describing MCPs. The tool descriptions live <em>inside</em> the MCP server, not in separate docs, because the model reads them at runtime and turns them into calls itself, rather than a developer reading docs ahead of time and writing the calls into code.
+        "MCP is a design choice" - you can understand that now, instead of just being a throwaway statement. The tool descriptions live <em>inside</em> the MCP server, not in separate docs, because the model reads them at runtime and turns them into calls itself, rather than a developer reading docs ahead of time and writing the calls into code.
       </p>
       <p>
-        And just like a badly written API doc makes an API harder for a developer to integrate and use, a badly written or misconfigured tool description leads to the LLM using the MCP tool incorrectly, or failing to invoke the right one when it is needed. MCP just standardizes <em>where</em> the description lives, not whether it is any good.
+        And just like a badly written API doc makes an API harder for a developer to integrate and use, a badly written or misconfigured tool description leads to the LLM using the MCP tool incorrectly, or failing to invoke the right one when it is needed.
       </p>
 
       <div class="callout">
@@ -788,7 +792,7 @@ code {
       </div>
 
       <p>
-        If you like the kind of explainer that shows the underlying mechanics, keep going. The next section describes what is <em>actually</em> happening when the model picks a tool: the protocol, the round trips, and ends on one product, a usual morning, handled two ways: a developer's fixed path on one side, a decision made at runtime on the other.
+        If you like the kind of explainer that shows the underlying mechanics, keep reading. The next section describes what's <em>actually</em> happening when the model picks a tool - the protocol, the round trips, and ends on one product, a usual morning, handled two ways: a developer's fixed path on one side, a decision made at runtime on the other.
       </p>
     </section>
 
@@ -798,7 +802,10 @@ code {
         An API is a mechanism for one program to call functions on another. A server exposes what it can do. A client asks for those things. The API is the contract between them: what messages you can send, in what shape, and what comes back.
       </p>
       <p>
-        The dominant style today is REST, defined by Roy Fielding in his 2000 doctoral dissertation. REST is not a protocol; it is a set of architectural constraints. Most REST APIs run over HTTP as the transport, with verbs like <code>GET</code> and <code>POST</code> applied to resource URLs. Each request stands alone: the server does not remember your previous call. This property has a name. REST is stateless. That is a big part of <em>why</em> you end up writing and maintaining integration code per tool. An MCP server also remembers nothing between calls. The context, the thread of the task, what has happened so far, lives in the LLM, in both cases.
+        The dominant style today is REST, defined by Roy Fielding in his 2000 doctoral dissertation. REST is not a protocol; it is a set of architectural constraints. Most REST APIs run over HTTP as the transport, with verbs like <code>GET</code> and <code>POST</code> applied to resource URLs. Each request stands alone: the server does not remember your previous call. This property has a name.
+      </p>
+      <p>
+        REST is stateless. That's a big part of <em>why</em> you end up writing and maintaining integration code per tool. MCP does keep some state, the session stays open between calls, but not the state people usually assume. The context of the task, what the user asked and what's been worked out so far, lives in the LLM, not in MCP.
       </p>
     </section>
 
@@ -1118,10 +1125,10 @@ code {
 
 <footer class="article-footer">
   <p style="font-size: 0.85rem; margin-bottom: 0.75rem;">
-    By <strong>Ankita Mathur</strong> · <a href="https://medium.com/@anki-mat">Medium</a> · <a href="https://x.com/AnkitaM1094">Twitter</a>
+    By <a href="https://www.linkedin.com/in/ankitamathur10/"><strong>Ankita Mathur</strong></a> · <a href="https://medium.com/@anki-mat">Medium</a> · <a href="https://x.com/AnkitaM1094">Twitter</a>
   </p>
   <p>
-    Primary sources: the <a href="https://modelcontextprotocol.io/specification/2025-11-25">Model Context Protocol specification</a>, IBM's <a href="https://www.ibm.com/think/topics/model-context-protocol">Model Context Protocol primer</a> and <a href="https://www.ibm.com/think/topics/rest-apis">REST APIs primer</a>, and Roy Fielding's 2000 doctoral dissertation on <a href="https://ics.uci.edu/~fielding/pubs/dissertation/top.htm">REST</a>. Comparisons drew on <a href="https://workos.com/blog/mcp-vs-rest">WorkOS</a>, <a href="https://blaxel.ai/blog/mcp-vs-api-guide">Blaxel</a>, and <a href="https://mcpmanager.ai/blog/mcp-vs-api/">MCP Manager</a>. The CLI-analogy framing and the "raw dog the API" security angle drew on this <a href="https://www.reddit.com/r/mcp/comments/1lqqfif/whats_the_point_of_mcp/">r/mcp thread</a>.
+    Primary sources: the <a href="https://modelcontextprotocol.io/specification/2025-11-25">Model Context Protocol specification</a>, IBM's <a href="https://www.ibm.com/think/topics/model-context-protocol">Model Context Protocol primer</a> and <a href="https://www.ibm.com/think/topics/rest-apis">REST APIs primer</a>, and Roy Fielding's 2000 doctoral dissertation on <a href="https://ics.uci.edu/~fielding/pubs/dissertation/top.htm">REST</a>. Comparisons drew on <a href="https://workos.com/blog/mcp-vs-rest">WorkOS</a>, <a href="https://blaxel.ai/blog/mcp-vs-api-guide">Blaxel</a>, and <a href="https://mcpmanager.ai/blog/mcp-vs-api/">MCP Manager</a>. The CLI-analogy framing and the "raw dog the API" security angle drew on this <a href="https://www.reddit.com/r/mcp/comments/1lqqfif/whats_the_point_of_mcp/">r/mcp thread</a>. Built as a distill.pub-style interactive using the <a href="https://github.com/analyticalmonk/explain-this">explain-this</a> Claude Code plugin by <a href="https://github.com/analyticalmonk">analyticalmonk</a>.
   </p>
 </footer>
 
