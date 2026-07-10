@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Explainers by Ankita Mathur</title>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --text: rgba(0, 0, 0, 0.8);
+  --text-secondary: rgba(0, 0, 0, 0.54);
+  --text-tertiary: rgba(0, 0, 0, 0.38);
+  --bg: #FAF8F4;
+  --link: #004276;
+  --border: rgba(0, 0, 0, 0.08);
+  --accent: #2563EB;
+  --font-serif: 'Crimson Pro', Georgia, 'Times New Roman', serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+html { font-size: 18px; -webkit-font-smoothing: antialiased; }
+body {
+  font-family: var(--font-serif);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 4rem 24px 6rem;
+}
+.overline {
+  font-family: var(--font-sans);
+  font-size: 0.7rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--accent);
+  margin-bottom: 0.75rem;
+}
+h1 {
+  font-size: 2.6rem; font-weight: 700;
+  line-height: 1.15; letter-spacing: -0.02em;
+  margin-bottom: 1rem;
+}
+.tagline {
+  font-size: 1.15rem; font-weight: 400; font-style: italic;
+  color: var(--text-secondary); line-height: 1.55;
+  margin-bottom: 3rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--border);
+}
+.explainer-list { list-style: none; margin: 0; padding: 0; }
+.explainer-item {
+  padding: 1.5rem 0;
+  border-bottom: 1px solid var(--border);
+}
+.explainer-item:last-child { border-bottom: none; }
+.explainer-item a {
+  color: var(--text);
+  text-decoration: none;
+  display: block;
+}
+.explainer-item h2 {
+  font-size: 1.5rem; font-weight: 600;
+  line-height: 1.3;
+  margin-bottom: 0.35rem;
+  color: var(--link);
+}
+.explainer-item p {
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+.explainer-item .meta {
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 0.5rem;
+  display: block;
+}
+footer {
+  margin-top: 4rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  color: var(--text-tertiary);
+}
+footer a { color: var(--text-secondary); }
+</style>
+</head>
+<body>
+<div class="overline">Explainers</div>
+<h1>Ankita Mathur</h1>
+<p class="tagline">Interactive explainers on things I have been figuring out. Written in plain terms for people who build with these ideas.</p>
+
+<ul class="explainer-list">
+  <li class="explainer-item">
+    <a href="./mcp-vs-rest/">
+      <h2>What Actually Changes When You Put MCP in Front of Your REST API?</h2>
+      <p>Less integration code for you to maintain, and less work for the model to figure out the call at runtime. The tool arrives already described.</p>
+      <span class="meta">10 min read · 3 interactive figures</span>
+    </a>
+  </li>
+</ul>
+
+<footer>
+  By <strong>Ankita Mathur</strong> · <a href="https://medium.com/@anki-mat">Medium</a> · <a href="https://x.com/AnkitaM1094">Twitter</a>
+</footer>
+</body>
+</html>

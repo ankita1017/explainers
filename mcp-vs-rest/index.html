@@ -1,0 +1,1541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What Actually Changes When You Put MCP in Front of Your REST API?</title>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --text: rgba(0, 0, 0, 0.8);
+  --text-secondary: rgba(0, 0, 0, 0.54);
+  --text-tertiary: rgba(0, 0, 0, 0.38);
+  --bg: #FAF8F4;
+  --link: #004276;
+  --border: rgba(0, 0, 0, 0.08);
+  --content-width: 720px;
+  --sidebar-width: 220px;
+
+  --font-serif: 'Crimson Pro', Georgia, 'Times New Roman', serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+
+  --accent: #2563EB;
+  --accent-light: #EFF6FF;
+  --accent-border: #BFDBFE;
+  --accent-dark: #1D4ED8;
+
+  --rest-primary: #D97706;
+  --rest-light:   #FEF3C7;
+  --rest-border:  #FDE68A;
+
+  --mcp-primary: #7C3AED;
+  --mcp-light:   #F5F0FF;
+  --mcp-border:  #DDD6FE;
+}
+
+html { font-size: 18px; -webkit-font-smoothing: antialiased; }
+body { font-family: var(--font-serif); background: var(--bg); color: var(--text); line-height: 1.75; }
+
+.page-wrapper {
+  max-width: calc(var(--content-width) + var(--sidebar-width) + 80px);
+  margin: 0 auto; padding: 0 24px;
+  display: flex; gap: 40px;
+}
+
+.sidebar {
+  width: var(--sidebar-width); flex-shrink: 0;
+  padding-top: 2.5rem;
+  position: sticky; top: 24px;
+  height: fit-content;
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+}
+#toc { display: flex; flex-direction: column; gap: 1px; }
+#toc a {
+  font-family: var(--font-sans); font-size: 0.72rem;
+  color: var(--text-secondary); text-decoration: none;
+  padding: 4px 12px;
+  border-left: 2px solid transparent;
+  transition: all 0.15s ease;
+  display: block;
+}
+#toc a.sub { padding-left: 24px; font-size: 0.68rem; color: var(--text-tertiary); }
+#toc a:hover { color: var(--text); }
+#toc a.active {
+  color: var(--accent-dark);
+  border-left-color: var(--accent);
+  font-weight: 600;
+}
+
+.content {
+  flex: 1; min-width: 0;
+  max-width: var(--content-width);
+  padding-bottom: 6rem;
+}
+
+.article-header {
+  padding: 3rem 0 2rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 2rem;
+}
+.overline {
+  font-family: var(--font-sans);
+  font-size: 0.7rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--accent);
+  margin-bottom: 0.75rem;
+  animation: slideInLeft 0.6s ease 0.1s both;
+}
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-8px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+h1 {
+  font-size: 2.8rem; font-weight: 700;
+  line-height: 1.1; letter-spacing: -0.02em;
+  margin-bottom: 1rem;
+  animation: fadeInUp 0.7s ease 0.2s both;
+}
+.article-subtitle {
+  font-size: 1.2rem; font-weight: 400; font-style: italic;
+  color: var(--text-secondary); line-height: 1.55;
+  animation: fadeInUp 0.7s ease 0.3s both;
+}
+.article-meta-header {
+  font-family: var(--font-sans); font-size: 0.72rem;
+  color: var(--text-tertiary);
+  margin-top: 1.5rem;
+  display: flex; gap: 16px; flex-wrap: wrap;
+  animation: fadeInUp 0.7s ease 0.4s both;
+}
+
+section { margin-top: 2.5rem; }
+h2 {
+  font-size: 1.65rem; font-weight: 600;
+  line-height: 1.25; letter-spacing: -0.01em;
+  margin-bottom: 1rem; padding-top: 0.5rem;
+}
+h3 {
+  font-size: 1.25rem; font-weight: 600;
+  line-height: 1.3;
+  margin-top: 1.8rem; margin-bottom: 0.75rem;
+}
+p { margin-bottom: 1rem; }
+.lead { font-size: 1.15rem; color: var(--text-secondary); line-height: 1.7; font-weight: 400; }
+a { color: var(--link); }
+
+code {
+  font-family: var(--font-mono); font-size: 0.82em;
+  background: rgba(0, 0, 0, 0.04);
+  padding: 0.15em 0.4em; border-radius: 3px;
+}
+.code-block {
+  background: #2C2C2C; color: #E0E0E0;
+  font-family: var(--font-mono); font-size: 0.75rem;
+  line-height: 1.7;
+  padding: 1.2rem 1.5rem; border-radius: 6px;
+  overflow-x: auto; margin: 1.2rem 0;
+}
+.code-block .kw  { color: #C792EA; }
+.code-block .str { color: #C3E88D; }
+.code-block .cm  { color: #6A7280; }
+.code-block .fn  { color: #82AAFF; }
+.code-block .ty  { color: #FFCB6B; }
+.code-block .num { color: #F78C6C; }
+
+.callout {
+  border-left: 3px solid var(--accent);
+  background: var(--accent-light);
+  padding: 1rem 1.25rem;
+  border-radius: 0 6px 6px 0;
+  margin: 1.5rem 0;
+  font-size: 0.95rem;
+}
+.callout strong { color: var(--accent-dark); }
+.callout p { margin: 0; }
+.callout p + p { margin-top: 0.75rem; }
+
+.epigraph {
+  border-left: 3px solid var(--accent-border);
+  padding: 1rem 1.5rem;
+  margin: 1.5rem 0;
+  font-style: italic; color: var(--text-secondary);
+  background: rgba(0, 0, 0, 0.015);
+  border-radius: 0 6px 6px 0;
+}
+.epigraph cite {
+  display: block; margin-top: 0.5rem;
+  font-style: normal;
+  font-family: var(--font-sans);
+  font-size: 0.75rem; color: var(--text-tertiary);
+}
+
+.figure {
+  margin: 2.5rem 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+}
+.figure-label {
+  font-family: var(--font-sans);
+  font-size: 0.65rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+  padding: 0.75rem 1rem 0;
+}
+.figure-canvas-wrap { width: 100%; }
+.figure-canvas-wrap canvas { display: block; width: 100%; }
+.figure-controls {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  background: rgba(0, 0, 0, 0.02);
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.ctrl-btn {
+  font-family: var(--font-sans);
+  font-size: 0.7rem; font-weight: 500;
+  padding: 0.4rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: #fff;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.ctrl-btn:hover { border-color: rgba(0, 0, 0, 0.2); background: rgba(0, 0, 0, 0.02); }
+.ctrl-btn.active { background: var(--text); color: #fff; border-color: var(--text); }
+.ctrl-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+.ctrl-btn.primary:hover { background: var(--accent-dark); border-color: var(--accent-dark); }
+.ctrl-label { font-family: var(--font-sans); font-size: 0.7rem; color: var(--text-tertiary); }
+.ctrl-separator { width: 1px; height: 20px; background: var(--border); margin: 0 0.3rem; }
+.figure-caption {
+  font-family: var(--font-sans);
+  font-size: 0.72rem; color: var(--text-secondary);
+  padding: 0.6rem 1rem 0.75rem;
+  border-top: 1px solid var(--border);
+  line-height: 1.55;
+}
+
+.comparison-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 1rem; margin: 1.5rem 0;
+}
+.comparison-cell {
+  background: rgba(0, 0, 0, 0.02);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1rem 1.2rem;
+}
+.comparison-cell h4 {
+  font-family: var(--font-sans);
+  font-size: 0.72rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  margin-bottom: 0.5rem;
+}
+.comparison-cell.rest h4 { color: var(--rest-primary); }
+.comparison-cell.mcp h4 { color: var(--mcp-primary); }
+.comparison-cell ul { list-style: none; font-size: 0.9rem; }
+.comparison-cell ul li {
+  padding: 0.2rem 0; padding-left: 1rem; position: relative;
+}
+.comparison-cell ul li::before {
+  content: ''; position: absolute; left: 0; top: 0.65em;
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--text-tertiary);
+}
+
+.concept-cards {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 1rem; margin: 1.5rem 0;
+}
+.concept-card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.2rem;
+  background: #fff;
+  transition: border-color 0.15s ease;
+}
+.concept-card:hover { border-color: rgba(0, 0, 0, 0.15); }
+.concept-card-badge {
+  display: inline-block;
+  font-family: var(--font-sans);
+  font-size: 0.6rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.05em;
+  padding: 2px 8px; border-radius: 3px;
+  margin-bottom: 0.6rem;
+  color: var(--accent-dark);
+  background: var(--accent-light);
+}
+.concept-card-name {
+  font-family: var(--font-mono);
+  font-size: 0.8rem; font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+.concept-card-desc {
+  font-family: var(--font-sans);
+  font-size: 0.75rem; color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.article-footer {
+  max-width: calc(var(--content-width) + var(--sidebar-width) + 80px);
+  margin: 0 auto;
+  padding: 2rem 24px 4rem;
+  border-top: 1px solid var(--border);
+}
+.article-footer p {
+  font-family: var(--font-sans);
+  font-size: 0.75rem; color: var(--text-tertiary);
+  line-height: 1.7;
+  margin-bottom: 0.5rem;
+}
+.article-footer a { color: var(--text-secondary); text-decoration: none; }
+.article-footer a:hover { text-decoration: underline; }
+
+.scenario-mockups {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+  margin: 1.8rem 0;
+}
+.mockup {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+}
+.mockup-label {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-tertiary);
+  margin-bottom: 0.8rem;
+  font-weight: 600;
+}
+.mockup.widget .widget-header {
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--border);
+}
+.mockup.widget .meeting-row {
+  display: flex;
+  gap: 10px;
+  padding: 7px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.04);
+  align-items: flex-start;
+}
+.mockup.widget .meeting-row:last-child { border-bottom: none; }
+.mockup.widget .meeting-time {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--rest-primary);
+  min-width: 42px;
+  font-weight: 600;
+  padding-top: 1px;
+}
+.mockup.widget .meeting-name {
+  font-weight: 600;
+  color: var(--text);
+  font-size: 0.84rem;
+  line-height: 1.3;
+}
+.mockup.widget .meeting-account {
+  color: var(--text-secondary);
+  font-size: 0.68rem;
+  margin-top: 1px;
+}
+.mockup.assistant {
+  background: linear-gradient(180deg, #fff, #FAF8F4);
+}
+.mockup.assistant .msg-user {
+  background: var(--mcp-light);
+  color: var(--mcp-primary);
+  border-radius: 12px 12px 4px 12px;
+  padding: 8px 12px;
+  font-size: 0.82rem;
+  margin-bottom: 10px;
+  max-width: 88%;
+  margin-left: auto;
+  font-weight: 500;
+  align-self: flex-end;
+}
+.mockup.assistant .msg-ai {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 4px 12px 12px 12px;
+  padding: 10px 12px;
+  font-size: 0.82rem;
+  color: var(--text);
+  line-height: 1.55;
+  max-width: 96%;
+}
+.mockup.assistant .msg-ai .msg-lead {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+.mockup.assistant .msg-ai ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.mockup.assistant .msg-ai li {
+  position: relative;
+  padding-left: 12px;
+  margin: 4px 0;
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+.mockup.assistant .msg-ai li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: var(--mcp-primary);
+  font-weight: 700;
+}
+
+.agent-flow {
+  background: linear-gradient(180deg, #fff, #fafaf7);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.2rem 1.4rem 1.4rem;
+  margin: 1.8rem 0;
+}
+.agent-flow-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 0.9rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.agent-flow-label {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-tertiary);
+  font-weight: 600;
+  font-family: var(--font-sans);
+}
+.agent-flow-caption {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  font-family: var(--font-sans);
+}
+.agent-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 9px 12px;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+}
+.agent-step + .agent-step { margin-top: 4px; }
+.agent-step .step-badge {
+  font-size: 0.58rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 3px 8px;
+  border-radius: 3px;
+  align-self: flex-start;
+  min-width: 46px;
+  text-align: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.agent-step.user .step-badge { background: rgba(0,0,0,0.06); color: var(--text); }
+.agent-step.orchestrator .step-badge { background: #f1f5f9; color: #334155; }
+.agent-step.retrieval .step-badge { background: #fef3c7; color: #92400e; }
+.agent-step.llm .step-badge { background: var(--mcp-light); color: var(--mcp-primary); }
+.agent-step.tool .step-badge { background: var(--accent-light); color: var(--accent-dark); }
+.agent-step.generator .step-badge { background: #ccfbf1; color: #0f766e; }
+.agent-step.response .step-badge { background: #ecfdf5; color: var(--rest-primary); }
+.agent-step .step-text {
+  flex: 1;
+  color: var(--text);
+  line-height: 1.45;
+}
+.agent-step .step-text code {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--mcp-primary);
+  background: transparent;
+  padding: 0;
+}
+.agent-step .step-text .step-detail {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  margin-top: 3px;
+}
+.agent-arrow {
+  text-align: center;
+  color: var(--text-tertiary);
+  font-size: 12px;
+  padding: 3px 0;
+  line-height: 1;
+}
+
+/* Figure: Same request, two abstraction levels */
+.abstraction-figure {
+  background: white;
+  overflow: hidden;
+}
+.abstraction-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 0.8rem 1rem 0;
+  background: rgba(0,0,0,0.02);
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.abstraction-tab {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-bottom: none;
+  background: white;
+  border-radius: 4px 4px 0 0;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: all 0.15s ease;
+}
+.abstraction-tab:hover { color: var(--mcp-primary); }
+.abstraction-tab.active {
+  color: var(--mcp-primary);
+  border-color: var(--mcp-primary);
+  border-bottom-color: white;
+  margin-bottom: -1px;
+  font-weight: 600;
+}
+.abstraction-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+}
+.abstraction-panel {
+  padding: 1rem 1.2rem;
+  border-right: 1px solid var(--border);
+  min-height: 220px;
+}
+.abstraction-panel:last-child {
+  border-right: none;
+  background: rgba(0,0,0,0.015);
+}
+.abstraction-panel-title {
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+}
+.abstraction-code {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  line-height: 1.75;
+  color: var(--text);
+}
+.abstraction-code .call-line { padding: 1px 0; }
+.abstraction-code .call-verb { color: var(--mcp-primary); font-weight: 600; }
+.abstraction-code .rest-verb { color: var(--rest-primary); font-weight: 600; }
+.abstraction-code .arrow-note {
+  color: var(--text-tertiary);
+  margin: 0.6rem 0;
+  font-style: italic;
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+}
+.abstraction-code .return-line {
+  color: var(--text-secondary);
+  padding: 1px 0;
+}
+
+/* Figure: Tool description quality */
+.quality-figure {
+  padding: 1rem 1.2rem 1.2rem;
+}
+.quality-btn-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 1.2rem;
+}
+.quality-btn {
+  flex: 1;
+  padding: 10px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  background: white;
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.quality-btn:hover {
+  border-color: var(--mcp-primary);
+  color: var(--mcp-primary);
+}
+.quality-btn.active {
+  color: white;
+  border-color: transparent;
+}
+.quality-btn.active.bad { background: var(--rest-primary); }
+.quality-btn.active.medium { background: #92400e; }
+.quality-btn.active.good { background: #0f766e; }
+.quality-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.quality-panel {
+  background: rgba(0,0,0,0.02);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.9rem 1rem;
+}
+.quality-panel-title {
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+  margin-bottom: 0.6rem;
+  font-weight: 600;
+}
+.quality-description {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: var(--text);
+  padding: 0.6rem 0.75rem;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  min-height: 120px;
+}
+.quality-response {
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: var(--text);
+}
+.quality-response .user-q {
+  font-style: italic;
+  color: var(--text-secondary);
+  margin-bottom: 0.6rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px dashed var(--border);
+  font-size: 0.8rem;
+}
+.quality-response .response-step {
+  padding: 4px 0;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  font-size: 0.82rem;
+}
+.quality-response .response-step .arrow {
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+  font-weight: 700;
+}
+.quality-response.bad .response-step:last-child { color: var(--rest-primary); font-weight: 500; }
+.quality-response.good .response-step:last-child { color: #0f766e; font-weight: 500; }
+
+@media (max-width: 600px) {
+  .abstraction-body { grid-template-columns: 1fr; }
+  .abstraction-panel { border-right: none; border-bottom: 1px solid var(--border); }
+  .quality-body { grid-template-columns: 1fr; }
+}
+
+.glossary {
+  margin: 1.5rem 0;
+  padding: 0;
+}
+.glossary-item {
+  padding: 0.9rem 0;
+  border-bottom: 1px solid var(--border);
+}
+.glossary-item:last-child { border-bottom: none; }
+.glossary-term {
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--accent-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 0 0 0.4rem 0;
+}
+.glossary-def {
+  font-size: 0.95rem;
+  color: var(--text);
+  line-height: 1.6;
+  margin: 0;
+}
+
+@media (max-width: 1060px) {
+  .sidebar { display: none; }
+  .page-wrapper { display: block; }
+  .content { max-width: 100%; }
+}
+@media (max-width: 600px) {
+  html { font-size: 16px; }
+  h1 { font-size: 2rem; }
+  .concept-cards { grid-template-columns: 1fr; }
+  .comparison-grid { grid-template-columns: 1fr; }
+  .scenario-mockups { grid-template-columns: 1fr; }
+  .figure-canvas-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .figure-canvas-wrap canvas { min-width: 520px; }
+}
+</style>
+</head>
+<body>
+
+<div class="page-wrapper">
+  <aside class="sidebar">
+    <nav id="toc">
+      <a href="#section-morning">The key difference</a>
+      <a href="#section-api">What is an API</a>
+      <a href="#section-mcp">The MCP protocol</a>
+      <a href="#fig-primitives" class="sub">The three primitives</a>
+      <a href="#fig-quality" class="sub">Tool description quality</a>
+      <a href="#section-scenarios">Two scenarios, one product</a>
+      <a href="#fig-scenarios" class="sub">Widget flow vs AI assistant flow</a>
+      <a href="#section-appendix">Appendix: Glossary</a>
+    </nav>
+  </aside>
+
+  <main class="content">
+    <header class="article-header">
+      <div class="overline">An interactive explainer</div>
+      <h1>What Actually Changes When You Put MCP in Front of Your REST API?</h1>
+      <p class="article-subtitle">Less integration code for you to maintain, and less work for the model to figure out the call at runtime. The tool arrives already described.</p>
+      <div class="article-meta-header">
+        <span>July 2026</span>
+        <span>10 min read</span>
+        <span>3 interactive figures</span>
+      </div>
+    </header>
+
+    <section id="section-morning">
+      <p class="lead">
+        <strong>What is the difference between a REST API and MCP?</strong> It should be a simple question with a jargon-free answer. Instead you read "an API for AI agents," "REST is stateless by design," or analogies trying to dumb it down for you: "MCPs are like USB ports, one universal connector for every tool." All technically correct, but none useful, decorating the definition of an MCP without explaining what changes mechanically when you build an agentic system on it.
+      </p>
+      <p>
+        Maybe you are on the other side of this. You have wrapped your data platform in an MCP server and you are telling customers to use this new thing. Do they need it? And can you clearly tell them why, in a sentence that is not an analogy? I was not able to, so I built this for myself.
+      </p>
+
+      <div class="callout">
+        <strong>TL;DR:</strong> With a REST API, you build and maintain the integration code for every tool your agent uses, updating it each time the API changes. With MCP, the provider ships a description of each tool (what it does, what inputs it takes) in a format the LLM can read at runtime, so you write less integration code of your own.
+      </div>
+
+      <h3>What is a "tool"?</h3>
+      <p>
+        In an agentic system, a tool is any action the agent can take on the outside world: fetch a calendar, query a database, send an email, look up a deal. Each one is a function the model can call, wrapped with a description of what it does and what inputs it needs. Unlike traditional code, the agent does not run tools on a fixed schedule; it reads the descriptions and decides, mid-task, which to call and in what order.
+      </p>
+      <p>
+        Take a simple one: give an agent a <code>get_weather</code> tool and ask "should I bike to work?" It calls the tool, reads the forecast, and answers. Ask "what's a good recipe for tonight?" and it ignores the tool entirely, since nothing in the question needs it. Same tool, available both times; the agent decides when it is relevant. That runtime choice is what makes it agentic.
+      </p>
+      <p>
+        So far, no MCP needed. You could write <code>get_weather</code> yourself, and the agent would use it the same way. For a single tool you own, that is reasonable. So where does MCP come in?
+      </p>
+      <p>
+        The moment the tool is not yours, MCP earns its place. If the weather service ships an MCP server, you point your agent at it and it discovers what tools are available, instead of you reading their API docs, writing the call, and updating your code every time they change a field.
+      </p>
+
+      <h3>Let the LLM read the docs and figure it out?</h3>
+      <p>
+        You could argue the LLM can just read the API docs and work out the call itself. Fair, but now it does that every single time, at runtime. Every call spends tokens and context re-deriving what a tool description would have told it. That is load you are paying for on every request, to work out something a tool description would have handed it up front.
+      </p>
+      <p>
+        "MCP is a design choice." You can understand that now, instead of it being a performative line describing MCPs. The tool descriptions live <em>inside</em> the MCP server, not in separate docs, because the model reads them at runtime and turns them into calls itself, rather than a developer reading docs ahead of time and writing the calls into code.
+      </p>
+      <p>
+        And just like a badly written API doc makes an API harder for a developer to integrate and use, a badly written or misconfigured tool description leads to the LLM using the MCP tool incorrectly, or failing to invoke the right one when it is needed. MCP just standardizes <em>where</em> the description lives, not whether it is any good.
+      </p>
+
+      <div class="callout">
+        <strong>The key difference between MCP and a REST API:</strong> with REST, you write and maintain the integration code for each tool yourself; with MCP, the provider describes the tool and the model reads that description at runtime. If that is what you came for, you can stop here.
+      </div>
+
+      <p>
+        If you like the kind of explainer that shows the underlying mechanics, keep going. The next section describes what is <em>actually</em> happening when the model picks a tool: the protocol, the round trips, and ends on one product, a usual morning, handled two ways: a developer's fixed path on one side, a decision made at runtime on the other.
+      </p>
+    </section>
+
+    <section id="section-api">
+      <h2>What is an API</h2>
+      <p>
+        An API is a mechanism for one program to call functions on another. A server exposes what it can do. A client asks for those things. The API is the contract between them: what messages you can send, in what shape, and what comes back.
+      </p>
+      <p>
+        The dominant style today is REST, defined by Roy Fielding in his 2000 doctoral dissertation. REST is not a protocol; it is a set of architectural constraints. Most REST APIs run over HTTP as the transport, with verbs like <code>GET</code> and <code>POST</code> applied to resource URLs. Each request stands alone: the server does not remember your previous call. This property has a name. REST is stateless. That is a big part of <em>why</em> you end up writing and maintaining integration code per tool. An MCP server also remembers nothing between calls. The context, the thread of the task, what has happened so far, lives in the LLM, in both cases.
+      </p>
+    </section>
+
+    <section id="section-mcp">
+      <h2>The MCP protocol</h2>
+      <p>
+        Anthropic published MCP in November 2024. Messages are JSON-RPC 2.0. A client (an LLM host like Claude Desktop or Cursor) opens a persistent session with a server, negotiates capabilities during initialization, and exchanges messages until either side disconnects. Transports are stdio for local servers and Streamable HTTP for remote ones.
+      </p>
+      <p>
+        Inside a session, MCP exposes three kinds of things a server can offer, each answering a different question about who decides when to use it.
+      </p>
+
+      <div class="concept-cards">
+        <div class="concept-card">
+          <div class="concept-card-badge" style="background: var(--mcp-light); color: var(--mcp-primary);">Model-controlled</div>
+          <div class="concept-card-name">Tools</div>
+          <div class="concept-card-desc">Functions the LLM decides to invoke when it needs them. Think of them as callable actions: query a database, send a message, look up a customer.</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-badge" style="background: var(--rest-light); color: var(--rest-primary);">App-controlled</div>
+          <div class="concept-card-name">Resources</div>
+          <div class="concept-card-desc">Data or context the application can attach to the model's window. Files, records, snippets. The app decides what to include, based on what the user is doing.</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-badge" style="background: var(--accent-light); color: var(--accent-dark);">User-controlled</div>
+          <div class="concept-card-name">Prompts</div>
+          <div class="concept-card-desc">Pre-written templates a user can invoke. Usually surfaced as slash commands or menu items. The user picks one; the LLM runs it.</div>
+        </div>
+      </div>
+
+      <p>
+        To ground this in an example, a CRM MCP server might expose <strong>tools</strong> like <code>find_at_risk_accounts</code> and <code>summarize_account_activity</code>; <strong>resources</strong> like <code>crm://accounts/{id}/notes</code> and <code>crm://deals/pipeline</code>; and <strong>prompts</strong> like <code>/weekly_pipeline_review</code> and <code>/draft_forecast_narrative</code>.
+      </p>
+      <p>
+        Notice what the three primitives are doing together. Tools give the model agency. Resources give the application curation. Prompts give the user shortcuts.
+      </p>
+      <p>
+        To see what an actual JSON-RPC message for each primitive looks like, click through the tabs in the figure below.
+      </p>
+
+      <div class="figure" id="fig-primitives">
+        <div class="figure-label">Figure 1 - The three primitives</div>
+        <div class="figure-canvas-wrap">
+          <canvas id="canvas-primitives" width="720" height="360"></canvas>
+        </div>
+        <div class="figure-controls" id="primitives-tabs">
+          <button class="ctrl-btn">Tools</button>
+          <button class="ctrl-btn">Resources</button>
+          <button class="ctrl-btn">Prompts</button>
+        </div>
+        <div class="figure-caption">
+          Each tab shows the JSON-RPC message the client sends and the <strong>who controls invocation</strong> badge. Notice the method name changes with the primitive: <code>tools/call</code>, <code>resources/read</code>, <code>prompts/get</code>.
+        </div>
+      </div>
+
+      <div class="callout">
+        <p><strong>Good to know:</strong> You will read that "MCP is bidirectional" in several places. What makes it feel like that is because it runs JSON-RPC over a persistent session (stdio locally, Streamable HTTP for remote servers). The session stays open, so both sides can send messages while it is live, for instance a server asking the model to generate something mid-task rather than only answering when it is called.</p>
+        <p>REST works the other way, and for good reason. A REST call is one round trip because the caller already knows the endpoint. Nothing needs negotiating, so a single ask-and-answer is enough. MCP's caller is a model discovering what is available at runtime and chaining several calls to answer one request, so the connection stays open as a session instead of closing after each exchange.</p>
+      </div>
+
+      <p>
+        The tool description is where the whole thing lives or dies. It is what the LLM reads to figure out what a tool does, when to call it, and with what arguments. Click through the three buttons below to see the same tool described three ways, and what the LLM does with each.
+      </p>
+
+      <div class="figure" id="fig-quality">
+        <div class="figure-label">Figure 2 - Tool description quality</div>
+        <div class="quality-figure">
+          <div class="quality-btn-row" id="quality-btns">
+            <button class="quality-btn active bad" data-level="0">Bad</button>
+            <button class="quality-btn medium" data-level="1">Medium</button>
+            <button class="quality-btn good" data-level="2">Good</button>
+          </div>
+          <div class="quality-body">
+            <div class="quality-panel">
+              <div class="quality-panel-title">Tool description (server-side)</div>
+              <div class="quality-description" id="quality-description"></div>
+            </div>
+            <div class="quality-panel">
+              <div class="quality-panel-title">LLM's response</div>
+              <div class="quality-response" id="quality-response">
+                <div class="user-q">User: "Which deals should I worry about this quarter?"</div>
+                <div id="quality-steps"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="figure-caption">
+          Same tool, three descriptions. Click to compare. Watch how the LLM's call and answer change. <strong>MCP is a mechanism, not magic</strong>; the description is where the mechanism becomes useful.
+        </div>
+      </div>
+    </section>
+
+    <section id="section-scenarios">
+      <h2>Two scenarios, one product, different choice</h2>
+      <p>
+        The best way to see when to reach for each is to take one product and use it two ways. Same underlying data, same user, same moment. Only the caller changes.
+      </p>
+
+      <p>
+        Same sales rep, same morning. Two very different flows.
+      </p>
+
+      <div class="comparison-grid">
+        <div class="comparison-cell rest">
+          <h4>Scenario A - Static widget</h4>
+          <p style="font-size: 0.9rem; margin: 0;">
+            The mobile app's home screen shows a "Today's meetings" widget. When the screen loads, the app fires <code>GET /users/me/meetings?date=today</code>. The server returns a JSON list of meetings. The app renders each one into a pre-built row: time, attendees, account name. Deterministic query, deterministic layout, developer wrote every line of this path.
+          </p>
+        </div>
+        <div class="comparison-cell mcp">
+          <h4>Scenario B - AI assistant</h4>
+          <p style="font-size: 0.9rem; margin: 0;">
+            The rep taps the AI assistant and asks, "What should I focus on this morning?" The LLM decides on the fly to fetch meetings, then to check which are with hot accounts, then to pull recent call notes, then to summarize. Each decision is a tool call over MCP. No developer wrote a "morning brief" flow. The LLM invented it.
+          </p>
+        </div>
+      </div>
+
+      <div class="scenario-mockups">
+        <div class="mockup widget">
+          <div class="mockup-label">What the widget looks like</div>
+          <div class="widget-header">Today's meetings</div>
+          <div class="meeting-row">
+            <div class="meeting-time">9:00</div>
+            <div>
+              <div class="meeting-name">Q3 Business Review</div>
+              <div class="meeting-account">Acme Corp</div>
+            </div>
+          </div>
+          <div class="meeting-row">
+            <div class="meeting-time">11:30</div>
+            <div>
+              <div class="meeting-name">Renewal Check-in</div>
+              <div class="meeting-account">Beacon Health</div>
+            </div>
+          </div>
+          <div class="meeting-row">
+            <div class="meeting-time">2:00</div>
+            <div>
+              <div class="meeting-name">Discovery Call</div>
+              <div class="meeting-account">Northwind Ltd</div>
+            </div>
+          </div>
+          <div class="meeting-row">
+            <div class="meeting-time">4:30</div>
+            <div>
+              <div class="meeting-name">Weekly Standup</div>
+              <div class="meeting-account">Internal</div>
+            </div>
+          </div>
+        </div>
+        <div class="mockup assistant">
+          <div class="mockup-label">What the AI assistant looks like</div>
+          <div class="msg-user">What should I focus on this morning?</div>
+          <div class="msg-ai">
+            <span class="msg-lead">Priority order for this morning:</span>
+            <ul>
+              <li><strong>9am Q3 Review with Acme:</strong> their champion changed roles last week; identify a new sponsor.</li>
+              <li><strong>11:30 Renewal with Beacon Health:</strong> prep the renewal ROI slide (they went silent for two weeks).</li>
+              <li><strong>2pm Discovery with Northwind:</strong> exploratory, no prep needed.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="agent-flow">
+        <div class="agent-flow-header">
+          <span class="agent-flow-label">Under the hood · Scenario B</span>
+          <span class="agent-flow-caption">A simple agent orchestrator. Real frameworks add memory, guardrails, and error handling on top.</span>
+        </div>
+        <div class="agent-step user">
+          <span class="step-badge">User</span>
+          <span class="step-text">"What should I focus on this morning?"</span>
+        </div>
+        <div class="agent-arrow">↓</div>
+        <div class="agent-step orchestrator">
+          <span class="step-badge">Orchestrator</span>
+          <span class="step-text">Receives the query, plans the task, coordinates the calls below</span>
+        </div>
+        <div class="agent-arrow">↓</div>
+        <div class="agent-step retrieval">
+          <span class="step-badge">Retrieval</span>
+          <span class="step-text">Pulls internal context: rep's territory, past preferences, agent instructions</span>
+        </div>
+        <div class="agent-arrow">↓</div>
+        <div class="agent-step llm">
+          <span class="step-badge">LLM</span>
+          <span class="step-text">Reads available MCP tools, decides which ones to call and in what order</span>
+        </div>
+        <div class="agent-arrow">↓</div>
+        <div class="agent-step tool">
+          <span class="step-badge">MCP</span>
+          <span class="step-text"><code>tools/call get_todays_meetings</code><span class="step-detail">Returns 4 meetings: Acme, Beacon, Northwind, Internal standup</span></span>
+        </div>
+        <div class="agent-arrow">↓</div>
+        <div class="agent-step tool">
+          <span class="step-badge">MCP</span>
+          <span class="step-text"><code>tools/call get_account_signals(acme)</code><span class="step-detail">Returns "champion changed roles last week"</span></span>
+        </div>
+        <div class="agent-arrow">↓</div>
+        <div class="agent-step tool">
+          <span class="step-badge">MCP</span>
+          <span class="step-text"><code>tools/call get_account_signals(beacon)</code><span class="step-detail">Returns "silent for 2 weeks"</span></span>
+        </div>
+        <div class="agent-arrow">↓</div>
+        <div class="agent-step llm">
+          <span class="step-badge">LLM</span>
+          <span class="step-text">Integrates tool results with retrieved context, prioritizes by risk signal</span>
+        </div>
+        <div class="agent-arrow">↓</div>
+        <div class="agent-step generator">
+          <span class="step-badge">Generator</span>
+          <span class="step-text">Formats the response as a prioritized bulleted brief</span>
+        </div>
+        <div class="agent-arrow">↓</div>
+        <div class="agent-step response">
+          <span class="step-badge">Reply</span>
+          <span class="step-text">"Priority order for this morning: 9am Q3 Review with Acme..."</span>
+        </div>
+      </div>
+
+      <p>
+        Same CRM, same data, same rep, same time of day. What changed is the caller. Scenario A has a developer-written program that already knows what it wants. Scenario B has an LLM that is deciding at runtime. That distinction, more than anything about the technology, is what tells you which protocol to reach for.
+      </p>
+
+      <p>
+        Play the two scenarios side by side in the figure below. Watch what flies over the wire in each.
+      </p>
+
+      <div class="figure" id="fig-scenarios">
+        <div class="figure-label">Figure 3 - Widget flow vs AI assistant flow</div>
+        <div class="figure-canvas-wrap">
+          <canvas id="canvas-scenarios" width="720" height="330"></canvas>
+        </div>
+        <div class="figure-controls" id="scenarios-tabs">
+          <button class="ctrl-btn">Scenario A - Widget</button>
+          <button class="ctrl-btn">Scenario B - Assistant</button>
+        </div>
+        <div class="figure-caption">
+          The same underlying data, accessed two different ways. In Scenario A, the app knows exactly which endpoint to call. In Scenario B, the <strong>LLM decides at runtime</strong> which tools to invoke and in what order.
+        </div>
+      </div>
+
+      <p>
+        Scenario B ends up making Scenario A's API call underneath. The MCP server takes the LLM's <code>get_todays_meetings</code> tool call and turns around to hit the same <code>GET /users/me/meetings?date=today</code> that the widget uses. MCP wraps the API you already had.
+      </p>
+
+
+      <div class="callout">
+        <strong>Rule of thumb:</strong> reach for REST when your caller is deterministic code that already knows the endpoint. Reach for MCP when your caller is an LLM that has to decide the endpoint at runtime. In most real systems, both live in the same product: the app UI hits REST directly, the AI assistant hits MCP, and the MCP server calls the same REST endpoints behind the scenes.
+      </div>
+
+      <p>
+        MCP does not replace your API. It adds a caller that decides at runtime instead of following a path you wrote.
+      </p>
+    </section>
+
+    <section id="section-appendix">
+      <h2>Appendix: Glossary</h2>
+      <p class="lead">
+        A quick reference for the vocabulary used throughout this article.
+      </p>
+
+      <dl class="glossary">
+        <div class="glossary-item">
+          <dt class="glossary-term">Host</dt>
+          <dd class="glossary-def">The top-level application you interact with (Claude Desktop, ChatGPT, Cursor). Owns the UI, the user session, and holds one or more MCP clients inside it.</dd>
+        </div>
+        <div class="glossary-item">
+          <dt class="glossary-term">MCP client</dt>
+          <dd class="glossary-def">A component inside the host that manages ONE connection to ONE MCP server. If your host is connected to Gmail, Salesforce, and GitHub, three MCP clients are running.</dd>
+        </div>
+        <div class="glossary-item">
+          <dt class="glossary-term">MCP server</dt>
+          <dd class="glossary-def">A program that exposes tools, resources, and prompts for one service. The Gmail MCP server wraps Gmail's underlying REST API. Servers can be local (running as a subprocess) or remote (running at a hosted URL).</dd>
+        </div>
+        <div class="glossary-item">
+          <dt class="glossary-term">LLM (Large Language Model)</dt>
+          <dd class="glossary-def">The reasoning engine. Claude, GPT, Gemini. Lives at the provider's data center and is accessed by the host through the provider's API. The LLM decides which tools to invoke based on what the user is asking.</dd>
+        </div>
+        <div class="glossary-item">
+          <dt class="glossary-term">API (Application Programming Interface)</dt>
+          <dd class="glossary-def">A mechanism for one program to call functions on another. A contract for what messages you can send, what shape they take, and what will come back.</dd>
+        </div>
+        <div class="glossary-item">
+          <dt class="glossary-term">REST API</dt>
+          <dd class="glossary-def">A common style of API built on HTTP verbs (GET, POST, PUT, DELETE) applied to URLs that represent resources. Stateless per request. Most public APIs are REST.</dd>
+        </div>
+        <div class="glossary-item">
+          <dt class="glossary-term">GraphQL</dt>
+          <dd class="glossary-def">An alternative API style where the client asks for exactly the fields it wants in one query, and the server returns just those fields. Includes runtime introspection so clients can discover the schema. Used by GitHub, Shopify, Salesforce.</dd>
+        </div>
+        <div class="glossary-item">
+          <dt class="glossary-term">Plugin</dt>
+          <dd class="glossary-def">A vendor-specific integration format that predated MCP. ChatGPT plugins, Cursor extensions, Claude tool-use APIs. Each vendor had its own format, so tool builders had to write one per vendor. MCP replaced this fragmentation with a shared format any client can consume.</dd>
+        </div>
+        <div class="glossary-item">
+          <dt class="glossary-term">Protocol</dt>
+          <dd class="glossary-def">An agreed set of rules for how two parties exchange messages: the format, the sequence, the meaning, the timing. Every conversation between systems needs one.</dd>
+        </div>
+        <div class="glossary-item">
+          <dt class="glossary-term">JSON-RPC 2.0</dt>
+          <dd class="glossary-def">The specific protocol MCP uses. JSON is the data format. RPC stands for Remote Procedure Call, meaning one system invoking a function on another. Transport-agnostic, so messages can move over HTTP, WebSockets, or stdio.</dd>
+        </div>
+        <div class="glossary-item">
+          <dt class="glossary-term">Transport</dt>
+          <dd class="glossary-def">How bytes physically move between MCP client and server. MCP supports stdio (subprocess pipes, for local servers) and Streamable HTTP with Server-Sent Events (for remote servers).</dd>
+        </div>
+        <div class="glossary-item">
+          <dt class="glossary-term">Tools, Resources, Prompts</dt>
+          <dd class="glossary-def">MCP's three primitives. Tools are actions the LLM invokes. Resources are data the application injects into context. Prompts are templates the user triggers.</dd>
+        </div>
+      </dl>
+    </section>
+
+  </main>
+</div>
+
+<footer class="article-footer">
+  <p style="font-size: 0.85rem; margin-bottom: 0.75rem;">
+    By <strong>Ankita Mathur</strong> · <a href="https://medium.com/@anki-mat">Medium</a> · <a href="https://x.com/AnkitaM1094">Twitter</a>
+  </p>
+  <p>
+    Primary sources: the <a href="https://modelcontextprotocol.io/specification/2025-11-25">Model Context Protocol specification</a>, IBM's <a href="https://www.ibm.com/think/topics/model-context-protocol">Model Context Protocol primer</a> and <a href="https://www.ibm.com/think/topics/rest-apis">REST APIs primer</a>, and Roy Fielding's 2000 doctoral dissertation on <a href="https://ics.uci.edu/~fielding/pubs/dissertation/top.htm">REST</a>. Comparisons drew on <a href="https://workos.com/blog/mcp-vs-rest">WorkOS</a>, <a href="https://blaxel.ai/blog/mcp-vs-api-guide">Blaxel</a>, and <a href="https://mcpmanager.ai/blog/mcp-vs-api/">MCP Manager</a>. The CLI-analogy framing and the "raw dog the API" security angle drew on this <a href="https://www.reddit.com/r/mcp/comments/1lqqfif/whats_the_point_of_mcp/">r/mcp thread</a>.
+  </p>
+</footer>
+
+<script>
+const dpr = window.devicePixelRatio || 1;
+
+function initCanvas(id) {
+  const canvas = document.getElementById(id);
+  const ctx = canvas.getContext('2d');
+  const cssW = canvas.width;
+  const cssH = canvas.height;
+  canvas.width = cssW * dpr;
+  canvas.height = cssH * dpr;
+  canvas.style.width = cssW + 'px';
+  canvas.style.height = cssH + 'px';
+  ctx.scale(dpr, dpr);
+  return { canvas, ctx, w: cssW, h: cssH };
+}
+
+// ========== Figure 1: The three primitives ==========
+(function() {
+  const { canvas, ctx, w, h } = initCanvas('canvas-primitives');
+  const variants = [
+    {
+      name: 'Tools',
+      controller: 'Model-controlled',
+      controllerColor: '#7C3AED',
+      controllerBg: '#F5F0FF',
+      desc: 'The LLM decides when to invoke a tool, based on the conversation.',
+      method: 'tools/call',
+      json: [
+        '{',
+        '  "jsonrpc": "2.0",',
+        '  "method": "tools/call",',
+        '  "params": {',
+        '    "name": "find_at_risk_accounts",',
+        '    "arguments": {',
+        '      "region": "APAC",',
+        '      "days_silent": 30',
+        '    }',
+        '  },',
+        '  "id": 42',
+        '}'
+      ]
+    },
+    {
+      name: 'Resources',
+      controller: 'App-controlled',
+      controllerColor: '#D97706',
+      controllerBg: '#FEF3C7',
+      desc: 'The application decides what data to inject into the model context.',
+      method: 'resources/read',
+      json: [
+        '{',
+        '  "jsonrpc": "2.0",',
+        '  "method": "resources/read",',
+        '  "params": {',
+        '    "uri": "crm://accounts/acme-corp/notes"',
+        '  },',
+        '  "id": 7',
+        '}'
+      ]
+    },
+    {
+      name: 'Prompts',
+      controller: 'User-controlled',
+      controllerColor: '#1D4ED8',
+      controllerBg: '#EFF6FF',
+      desc: 'The user invokes a template. Typically a slash command or menu item.',
+      method: 'prompts/get',
+      json: [
+        '{',
+        '  "jsonrpc": "2.0",',
+        '  "method": "prompts/get",',
+        '  "params": {',
+        '    "name": "weekly_pipeline_review",',
+        '    "arguments": { "quarter": "Q3" }',
+        '  },',
+        '  "id": 11',
+        '}'
+      ]
+    }
+  ];
+  let current = 0;
+
+  function draw() {
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, w, h);
+
+    const v = variants[current];
+
+    // Name
+    ctx.font = '700 28px "Crimson Pro", serif';
+    ctx.fillStyle = 'rgba(0,0,0,0.85)';
+    ctx.textAlign = 'left';
+    ctx.fillText(v.name, 40, 56);
+
+    // Controller badge
+    const badgeText = v.controller;
+    ctx.font = '600 11px -apple-system, sans-serif';
+    const badgeW = ctx.measureText(badgeText).width + 20;
+    ctx.fillStyle = v.controllerBg;
+    ctx.beginPath();
+    ctx.roundRect(40, 74, badgeW, 22, 4);
+    ctx.fill();
+    ctx.fillStyle = v.controllerColor;
+    ctx.textBaseline = 'middle';
+    ctx.fillText(badgeText, 50, 86);
+    ctx.textBaseline = 'alphabetic';
+
+    // Description
+    ctx.font = '400 15px "Crimson Pro", serif';
+    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+    ctx.fillText(v.desc, 40, 128);
+
+    // Method chip
+    ctx.font = '500 12px "JetBrains Mono", monospace';
+    ctx.fillStyle = 'rgba(0,0,0,0.04)';
+    const methodW = ctx.measureText(v.method).width + 16;
+    ctx.beginPath();
+    ctx.roundRect(40, 148, methodW, 22, 4);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(0,0,0,0.7)';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(v.method, 48, 160);
+    ctx.textBaseline = 'alphabetic';
+
+    // Code block
+    ctx.fillStyle = '#2C2C2C';
+    ctx.beginPath();
+    ctx.roundRect(40, 186, w - 80, h - 210, 6);
+    ctx.fill();
+
+    ctx.font = '400 12.5px "JetBrains Mono", monospace';
+    ctx.textAlign = 'left';
+    for (let i = 0; i < v.json.length; i++) {
+      const line = v.json[i];
+      const y = 210 + i * 16;
+      const colored = colorizeJson(line);
+      let x = 60;
+      for (const seg of colored) {
+        ctx.fillStyle = seg.color;
+        ctx.fillText(seg.text, x, y);
+        x += ctx.measureText(seg.text).width;
+      }
+    }
+  }
+
+  function colorizeJson(line) {
+    // Simple color hints for JSON keys, string values, numbers, braces
+    const segs = [];
+    const keyRe = /"([^"]+)"\s*:/;
+    const strRe = /"([^"]*)"/;
+    const numRe = /\b(\d+)\b/;
+    let remaining = line;
+    while (remaining.length) {
+      const trimmed = remaining.match(/^\s+/);
+      if (trimmed) {
+        segs.push({ text: trimmed[0], color: '#E0E0E0' });
+        remaining = remaining.slice(trimmed[0].length);
+        continue;
+      }
+      const k = remaining.match(/^"([^"]+)"(?=\s*:)/);
+      if (k) {
+        segs.push({ text: k[0], color: '#82AAFF' });
+        remaining = remaining.slice(k[0].length);
+        continue;
+      }
+      const s = remaining.match(/^"([^"]*)"/);
+      if (s) {
+        segs.push({ text: s[0], color: '#C3E88D' });
+        remaining = remaining.slice(s[0].length);
+        continue;
+      }
+      const n = remaining.match(/^\d+/);
+      if (n) {
+        segs.push({ text: n[0], color: '#F78C6C' });
+        remaining = remaining.slice(n[0].length);
+        continue;
+      }
+      segs.push({ text: remaining[0], color: '#E0E0E0' });
+      remaining = remaining.slice(1);
+    }
+    return segs;
+  }
+
+  const tabs = document.querySelectorAll('#primitives-tabs .ctrl-btn');
+  tabs.forEach((btn, i) => {
+    btn.addEventListener('click', () => {
+      current = i;
+      tabs.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      draw();
+    });
+  });
+  tabs[0].classList.add('active');
+  draw();
+})();
+
+// ========== Figure 2: Tool description quality ==========
+(function() {
+  const levels = [
+    {
+      quality: 'bad',
+      desc: '"Returns accounts."',
+      steps: [
+        'Calls tool with no parameters.',
+        'Server returns 847 accounts.',
+        'LLM gives up, asks user for clarification.'
+      ]
+    },
+    {
+      quality: 'medium',
+      desc: '"Returns a list of accounts filtered by risk signals."',
+      steps: [
+        'Calls tool with generic filter.',
+        'Returns 12 accounts.',
+        'LLM presents them as a list, no context on why each is at risk.'
+      ]
+    },
+    {
+      quality: 'good',
+      desc: '"Find CRM accounts showing risk signals like champion changes, extended silence (>2 weeks), competitor mentions in emails, or negative sentiment shifts. Returns account ID, name, risk score (0-100), primary contact, and top signal type."',
+      steps: [
+        'Calls with quarter="Q3" and signal_types=["champion_change","silence"].',
+        'Returns 3 accounts with scores and reasons.',
+        'LLM writes a prioritized brief.'
+      ]
+    }
+  ];
+  const descEl = document.getElementById('quality-description');
+  const stepsEl = document.getElementById('quality-steps');
+  const responseEl = document.getElementById('quality-response');
+  const btns = document.querySelectorAll('#quality-btns .quality-btn');
+  function update(idx) {
+    const level = levels[idx];
+    descEl.textContent = level.desc;
+    stepsEl.innerHTML = level.steps.map(s =>
+      '<div class="response-step"><span class="arrow">&darr;</span><span>' + s + '</span></div>'
+    ).join('');
+    responseEl.className = 'quality-response ' + level.quality;
+    btns.forEach(b => b.classList.remove('active'));
+    btns[idx].classList.add('active');
+    btns[idx].classList.add(level.quality);
+  }
+  btns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      update(parseInt(btn.dataset.level, 10));
+    });
+  });
+  update(0);
+})();
+
+// ========== Figure 3: Two scenarios, side by side ==========
+(function() {
+  const { canvas, ctx, w, h } = initCanvas('canvas-scenarios');
+  const scenarios = [
+    {
+      name: 'Scenario A - Static widget',
+      color: '#D97706',
+      colorLight: '#FEF3C7',
+      caller: 'Mobile app UI',
+      callerSub: 'developer-written code',
+      trigger: 'Home screen loads',
+      protocol: 'REST',
+      calls: [
+        'GET /users/me/meetings?date=today'
+      ],
+      response: 'JSON list of meetings',
+      renders: 'Fixed layout: time, attendees, account'
+    },
+    {
+      name: 'Scenario B - AI assistant',
+      color: '#7C3AED',
+      colorLight: '#F5F0FF',
+      caller: 'LLM agent',
+      callerSub: 'reasoning at runtime',
+      trigger: '"What should I focus on this morning?"',
+      protocol: 'MCP',
+      calls: [
+        'tools/call get_todays_meetings',
+        'tools/call get_account_signals',
+        'tools/call get_recent_call_notes',
+        'sampling → summarize'
+      ],
+      response: 'Narrative summary',
+      renders: 'Free-form assistant message'
+    }
+  ];
+  let current = 0;
+
+  function draw() {
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, w, h);
+
+    const s = scenarios[current];
+
+    // Header stripe
+    ctx.fillStyle = s.colorLight;
+    ctx.fillRect(0, 0, w, 44);
+    ctx.font = '600 14px -apple-system, sans-serif';
+    ctx.fillStyle = s.color;
+    ctx.textAlign = 'left';
+    ctx.fillText(s.name, 32, 28);
+
+    // Layout: 4 rows top to bottom
+    // 1. Caller
+    // 2. Trigger / prompt
+    // 3. Protocol path (calls)
+    // 4. Response / render
+
+    let y = 76;
+    const labelX = 32;
+    const boxX = 180;
+    const boxW = w - boxX - 40;
+
+    drawRow('Caller', s.caller + ' · ' + s.callerSub, labelX, boxX, y, boxW, s.color, false);
+    y += 60;
+    drawRow('Trigger', s.trigger, labelX, boxX, y, boxW, s.color, false);
+    y += 60;
+    drawRowMulti('Protocol path (' + s.protocol + ')', s.calls, labelX, boxX, y, boxW, s.color);
+    y += 26 + s.calls.length * 18;
+    y += 12;
+    drawRow('Result', s.response + ' → ' + s.renders, labelX, boxX, y, boxW, s.color, false);
+  }
+
+  function drawRow(label, text, labelX, boxX, y, boxW, color, mono) {
+    ctx.font = '600 10px -apple-system, sans-serif';
+    ctx.fillStyle = 'rgba(0,0,0,0.4)';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+    ctx.fillText(label.toUpperCase(), labelX, y);
+    ctx.font = mono ? '400 13px "JetBrains Mono", monospace' : '400 15px "Crimson Pro", serif';
+    ctx.fillStyle = 'rgba(0,0,0,0.75)';
+    wrap(text, boxX, y, boxW, 20);
+    ctx.textBaseline = 'alphabetic';
+  }
+
+  function drawRowMulti(label, lines, labelX, boxX, y, boxW, color) {
+    ctx.font = '600 10px -apple-system, sans-serif';
+    ctx.fillStyle = 'rgba(0,0,0,0.4)';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+    ctx.fillText(label.toUpperCase(), labelX, y);
+    ctx.font = '400 12px "JetBrains Mono", monospace';
+    ctx.fillStyle = color;
+    for (let i = 0; i < lines.length; i++) {
+      // bullet
+      ctx.beginPath();
+      ctx.arc(boxX - 10, y + 6 + i * 18, 2.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillText(lines[i], boxX, y + i * 18);
+    }
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillStyle = 'rgba(0,0,0,0.75)';
+  }
+
+  function wrap(text, x, y, maxWidth, lineHeight) {
+    const words = text.split(' ');
+    let line = '';
+    let cursorY = y;
+    for (let i = 0; i < words.length; i++) {
+      const test = line + words[i] + ' ';
+      if (ctx.measureText(test).width > maxWidth && i > 0) {
+        ctx.fillText(line, x, cursorY);
+        line = words[i] + ' ';
+        cursorY += lineHeight;
+      } else {
+        line = test;
+      }
+    }
+    ctx.fillText(line, x, cursorY);
+  }
+
+  const tabs = document.querySelectorAll('#scenarios-tabs .ctrl-btn');
+  tabs.forEach((btn, i) => {
+    btn.addEventListener('click', () => {
+      current = i;
+      tabs.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      draw();
+    });
+  });
+  tabs[0].classList.add('active');
+  draw();
+})();
+
+
+// ========== Sidebar scroll tracking ==========
+(function() {
+  const links = document.querySelectorAll('#toc a');
+  const sections = [];
+  links.forEach(link => {
+    const id = link.getAttribute('href').slice(1);
+    const el = document.getElementById(id);
+    if (el) sections.push({ id, el, link });
+  });
+
+  function update() {
+    const scrollY = window.scrollY + 80;
+    let current = sections[0];
+    for (const s of sections) {
+      if (s.el.offsetTop <= scrollY) current = s;
+    }
+    links.forEach(l => l.classList.remove('active'));
+    if (current) current.link.classList.add('active');
+  }
+
+  window.addEventListener('scroll', update, { passive: true });
+  update();
+})();
+</script>
+
+</body>
+</html>
