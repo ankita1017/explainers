@@ -1,0 +1,1086 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Who Said That?</title>
+<meta name="description" content="Why one meeting transcript says Jessica and the next says Speaker 2.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --text: rgba(0, 0, 0, 0.8);
+  --text-secondary: rgba(0, 0, 0, 0.54);
+  --text-tertiary: rgba(0, 0, 0, 0.38);
+  --bg: #FAF8F4;
+  --link: #004276;
+  --border: rgba(0, 0, 0, 0.08);
+  --content-width: 720px;
+  --sidebar-width: 220px;
+
+  --font-serif: 'Crimson Pro', Georgia, 'Times New Roman', serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+
+  --accent: #2563EB;
+  --accent-light: #EFF6FF;
+  --accent-border: #BFDBFE;
+  --accent-dark: #1D4ED8;
+
+  --paul-primary: #D97706;
+  --paul-light:   #FEF3C7;
+  --jess-primary: #7C3AED;
+  --jess-light:   #F5F0FF;
+}
+
+html { font-size: 20px; -webkit-font-smoothing: antialiased; }
+body { font-family: var(--font-serif); background: var(--bg); color: var(--text); line-height: 1.75; }
+
+/* ---------- layout ---------- */
+.page-wrapper {
+  max-width: calc(var(--content-width) + var(--sidebar-width) + 80px);
+  margin: 0 auto; padding: 0 24px;
+  display: flex; gap: 40px;
+}
+.sidebar {
+  width: var(--sidebar-width); flex-shrink: 0;
+  padding-top: 2.5rem;
+  position: sticky; top: 24px;
+  height: fit-content;
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+}
+#toc { display: flex; flex-direction: column; gap: 1px; }
+#toc a {
+  font-family: var(--font-sans); font-size: 0.72rem;
+  color: var(--text-secondary); text-decoration: none;
+  padding: 4px 12px;
+  border-left: 2px solid transparent;
+  transition: all 0.15s ease;
+  display: block;
+}
+#toc a.sub { padding-left: 24px; font-size: 0.68rem; color: var(--text-tertiary); }
+#toc a:hover { color: var(--text); }
+#toc a.active { color: var(--accent-dark); border-left-color: var(--accent); font-weight: 600; }
+
+.content { flex: 1; min-width: 0; max-width: var(--content-width); padding-bottom: 1rem; }
+.content section + section {
+  margin-top: 1.6rem;
+  padding-top: 1.6rem;
+  border-top: 1px solid var(--border);
+}
+section { margin-top: 2rem; }
+
+/* ---------- header ---------- */
+.article-header {
+  padding: 3rem 0 2rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 2rem;
+}
+.overline {
+  font-family: var(--font-sans);
+  font-size: 0.7rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--accent);
+  margin-bottom: 0.75rem;
+  animation: slideInLeft 0.6s ease 0.1s both;
+}
+@keyframes slideInLeft { from { opacity:0; transform:translateX(-8px);} to { opacity:1; transform:none;} }
+@keyframes fadeInUp   { from { opacity:0; transform:translateY(12px);} to { opacity:1; transform:none;} }
+h1 {
+  font-size: 2.8rem; font-weight: 700;
+  line-height: 1.1; letter-spacing: -0.02em;
+  margin-bottom: 1rem;
+  animation: fadeInUp 0.7s ease 0.2s both;
+}
+.article-subtitle {
+  font-size: 1.2rem; font-weight: 400;
+  color: var(--text-secondary); line-height: 1.55;
+  animation: fadeInUp 0.7s ease 0.3s both;
+}
+.article-meta-header {
+  font-family: var(--font-sans); font-size: 0.72rem;
+  color: var(--text-tertiary);
+  margin-top: 1.5rem;
+  display: flex; gap: 16px; flex-wrap: wrap;
+  animation: fadeInUp 0.7s ease 0.4s both;
+}
+
+/* ---------- prose ---------- */
+h2 { font-size: 1.65rem; font-weight: 600; line-height: 1.25; letter-spacing: -0.01em; margin-bottom: 1rem; padding-top: 0.5rem; }
+h3 { font-size: 1.25rem; font-weight: 600; line-height: 1.3; margin-top: 1.8rem; margin-bottom: 0.75rem; }
+p { margin-bottom: 1rem; }
+.lead { font-size: 1.15rem; color: var(--text-secondary); line-height: 1.7; font-weight: 400; }
+a { color: var(--link); }
+
+code { font-family: var(--font-mono); font-size: 0.82em; background: rgba(0,0,0,0.04); padding: 0.15em 0.4em; border-radius: 3px; }
+
+ul.question-list, ul.route-list { list-style: none; margin: 1.2rem 0; }
+ul.question-list li, ul.route-list li { padding: 0.1rem 0 0.1rem 1.1rem; position: relative; }
+ul.question-list { margin: 0.9rem 0; }
+ul.question-list li::before, ul.route-list li::before {
+  content: ''; position: absolute; left: 0; top: 0.85em;
+  width: 5px; height: 5px; border-radius: 50%; background: var(--text-tertiary);
+}
+ol.step-list { counter-reset: s; list-style: none; margin: 1.2rem 0; }
+ol.step-list li { counter-increment: s; position: relative; padding-left: 2.1rem; margin-bottom: 0.7rem; }
+ol.step-list li::before {
+  content: counter(s); position: absolute; left: 0; top: 0.42em;
+  width: 1.3rem; height: 1.3rem; border-radius: 50%;
+  background: var(--accent-light); color: var(--accent-dark);
+  font-family: var(--font-sans); font-size: 0.62rem; font-weight: 600;
+  display: grid; place-items: center;
+}
+
+.callout {
+  border-left: 3px solid var(--accent);
+  background: var(--accent-light);
+  padding: 1rem 1.25rem;
+  border-radius: 0 6px 6px 0;
+  margin: 1.5rem 0;
+  font-size: 0.95rem;
+}
+.callout strong { color: var(--accent-dark); }
+.callout.in-list { margin: 0.75rem 0 0.3rem; font-size: 0.9rem; }
+.callout p { margin: 0; }
+.callout p + p { margin-top: 0.75rem; }
+
+.epigraph {
+  border-left: 3px solid var(--accent-border);
+  padding: 1rem 1.5rem;
+  margin: 1.5rem 0;
+  font-style: italic; color: var(--text-secondary);
+  background: rgba(0,0,0,0.015);
+  border-radius: 0 6px 6px 0;
+  font-size: 1.15rem; line-height: 1.5;
+}
+
+/* transcript block */
+.transcript {
+  background: #fff; border: 1px solid var(--border); border-radius: 8px;
+  padding: 0.9rem 1.2rem; margin: 1.5rem 0;
+}
+.trow { display: flex; gap: 0.8rem; align-items: baseline; padding: 0.35rem 0; }
+.trow + .trow { border-top: 1px solid var(--border); }
+.tname {
+  font-family: var(--font-sans); font-size: 0.72rem; font-weight: 600;
+  flex: 0 0 5.2rem; text-align: right;
+}
+.tname.p { color: var(--paul-primary); }
+.tname.j { color: var(--jess-primary); }
+.tname.anon { color: var(--text-tertiary); font-family: var(--font-mono); font-size: 0.62rem; font-weight: 500; }
+.ttext { font-size: 0.95rem; line-height: 1.5; }
+.tmeta {
+  font-family: var(--font-sans); font-size: 0.7rem; color: var(--text-tertiary);
+  margin: 0.6rem 0 0; padding-top: 0.55rem; border-top: 1px solid var(--border);
+}
+
+/* sidenotes */
+/* ---------- figures ---------- */
+.figure { margin: 2.5rem 0; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: #fff; }
+.figure-label {
+  font-family: var(--font-sans); font-size: 0.65rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+  padding: 0.75rem 1rem 0;
+}
+.figure-canvas-wrap { width: 100%; padding: 0 5px; }
+.figure-canvas-wrap svg { display: block; width: 100%; }
+.swipe { display: none; font-family: var(--font-sans); font-size: 0.62rem; color: var(--text-tertiary); padding: 0 1rem 0.5rem; margin: 0; }
+.figure-controls {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  background: rgba(0,0,0,0.02);
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.ctrl-label { font-family: var(--font-sans); font-size: 0.7rem; color: var(--text-tertiary); }
+.ctrl-separator { width: 1px; height: 20px; background: var(--border); margin: 0 0.3rem; }
+.ctrl-btn {
+  font-family: var(--font-sans); font-size: 0.7rem; font-weight: 500;
+  padding: 0.4rem 0.9rem;
+  border: 1px solid var(--border); border-radius: 4px;
+  background: #fff; color: var(--text-secondary);
+  cursor: pointer; transition: all 0.15s ease;
+}
+.ctrl-btn:hover { border-color: rgba(0,0,0,0.2); background: rgba(0,0,0,0.02); }
+.ctrl-btn[aria-selected="true"] { background: var(--text); color: #fff; border-color: var(--text); }
+.ctrl-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+.ctrl-btn.primary:hover { background: var(--accent-dark); border-color: var(--accent-dark); }
+.ctrl-btn:disabled { background: rgba(0,0,0,0.04); color: var(--text-tertiary); border-color: var(--border); cursor: default; }
+.ctrl-btn:focus-visible, #toc a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.stepdots { display: flex; gap: 4px; margin-left: auto; }
+.stepdots i { width: 5px; height: 5px; border-radius: 50%; background: var(--border); display: block; }
+.stepdots i.on { background: var(--accent); }
+
+.figure-readout {
+  font-family: var(--font-sans); font-size: 0.72rem; line-height: 1.55;
+  color: var(--text); background: var(--accent-light);
+  border-top: 1px solid var(--border);
+  padding: 0.7rem 1rem;
+}
+.figure-readout em { color: var(--text-secondary); }
+.figure-readout code { font-size: 0.9em; background: rgba(0,0,0,0.05); }
+
+.figure-ledger { border-top: 1px solid var(--border); }
+.lrow { display: flex; align-items: center; gap: 0.7rem; padding: 0.5rem 1rem; }
+.lrow + .lrow { border-top: 1px solid var(--border); }
+.lq { font-family: var(--font-sans); font-size: 0.72rem; color: var(--text-secondary); flex: 1; }
+.lv { font-family: var(--font-sans); font-size: 0.68rem; font-weight: 600; display: flex; align-items: center; gap: 0.4rem; flex: 0 0 auto; }
+.lv .dot { width: 0.8rem; height: 0.8rem; border-radius: 50%; display: grid; place-items: center; font-size: 0.5rem; color: #fff; }
+.lv.given { color: var(--accent-dark); } .lv.given .dot { background: var(--accent); }
+.lv.infer { color: var(--paul-primary); } .lv.infer .dot { background: var(--paul-primary); }
+.lv.none  { color: var(--text-tertiary); } .lv.none .dot { background: var(--text-tertiary); }
+
+.figure .transcript { margin: 0; border: 0; border-top: 1px solid var(--border); border-radius: 0; }
+
+.figure-caption {
+  font-family: var(--font-sans);
+  font-size: 0.72rem; color: var(--text-secondary);
+  padding: 0.6rem 1rem 0.75rem;
+  border-top: 1px solid var(--border);
+  line-height: 1.55;
+}
+.figure-caption strong { color: var(--text); }
+
+/* ---------- footer ---------- */
+.article-footer {
+  max-width: calc(var(--content-width) + var(--sidebar-width) + 80px);
+  margin: 0 auto;
+  padding: 2rem 24px 4rem;
+  border-top: 1px solid var(--border);
+}
+.article-footer p { font-family: var(--font-sans); font-size: 0.75rem; color: var(--text-tertiary); line-height: 1.7; margin-bottom: 0.5rem; }
+.article-footer h4 { font-family: var(--font-sans); font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-secondary); margin-bottom: 0.75rem; }
+.article-footer ul.sources-list {
+  font-family: var(--font-sans); font-size: 0.75rem; color: var(--text-tertiary);
+  line-height: 1.7; margin: 0 0 1.25rem 1.25rem; padding: 0; list-style: disc;
+}
+.article-footer ul.sources-list li { margin-bottom: 0.4rem; }
+.article-footer ul.sources-list code { font-size: 0.9em; }
+.article-footer .byline { padding-top: 1rem; border-top: 1px solid var(--border); margin-bottom: 0; }
+.article-footer a { color: var(--text-secondary); text-decoration: none; }
+.article-footer a:hover { text-decoration: underline; }
+
+/* ---------- responsive ---------- */
+@media (max-width: 1060px) {
+  .sidebar { display: none; }
+  .page-wrapper { display: block; }
+  .content { max-width: 100%; }
+}
+@media (max-width: 600px) {
+  html { font-size: 16px; }
+  h1 { font-size: 2rem; }
+  .figure-canvas-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .figure-canvas-wrap svg { min-width: 520px; }
+  .swipe { display: block; }
+  .lrow { flex-wrap: wrap; gap: 0.3rem; }
+  .lq { flex: 1 0 100%; }
+  .tname { flex-basis: 4.4rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="page-wrapper">
+  <aside class="sidebar">
+    <nav id="toc">
+      <a href="#section-intro">Introduction</a>
+      <a href="#section-capture">Where did the audio come from?</a>
+      <a href="#fig-tap" class="sub">Where did you tap into the call?</a>
+      <a href="#section-diarization">If all you have is one recording</a>
+      <a href="#fig-diarize" class="sub">Two voices, still no names</a>
+      <a href="#section-identity">Names are not in the waveform</a>
+      <a href="#fig-identity" class="sub">Turn Speaker 2 into Jessica</a>
+      <a href="#section-asr">What speech-to-text does</a>
+      <a href="#section-stakes">Why a wrong name matters</a>
+      <a href="#section-close">Finding where the problem is</a>
+    </nav>
+  </aside>
+
+  <main class="content">
+    <header class="article-header">
+      <div class="overline">An interactive explainer</div>
+      <h1>Who Said That?</h1>
+      <p class="article-subtitle">Why does one meeting transcript say Jessica and another Speaker 2?</p>
+      <div class="article-meta-header">
+        <span>September 2026</span>
+        <span>7 min read</span>
+        <span>3 interactive figures</span>
+      </div>
+    </header>
+
+    <section id="section-intro">
+      <p class="lead">An accurate transcript, with notes and action items waiting the moment a call ends, has become almost mundane. Speech-to-text got good enough that most of us stopped thinking about the underlying method, which is not yet perfect, but good enough.</p>
+
+      <div class="transcript">
+        <div class="trow"><span class="tname p">Paul</span><span class="ttext">Can your team deploy this by October?</span></div>
+        <div class="trow"><span class="tname j">Jessica</span><span class="ttext">October will be difficult. November is more realistic.</span></div>
+      </div>
+
+      <p>I recently spent time with the team responsible for how our conversation intelligence tool integrates with meeting providers like Zoom, Teams and Google Meet. I knew how audio is captured as streams and turned into text.</p>
+
+      <p>What I had never thought about was how that text gets split up by speakers at all, how the audio gets split where the voice changes, and the pieces grouped by whoever they sound like. That part has a name: <strong>diarization</strong>, derived from <em>diary</em>: a record of what happened, in order, with the time attached.</p>
+
+      <p>But diarization only gets you this:</p>
+
+      <div class="transcript">
+        <div class="trow"><span class="tname anon">Speaker 1</span><span class="ttext">Can your team deploy this by October?</span></div>
+        <div class="trow"><span class="tname anon">Speaker 2</span><span class="ttext">October will be difficult. November is more realistic.</span></div>
+      </div>
+
+      <p>It still does not know that Speaker 2 is Jessica. That is a whole different problem, and trying to understand it led me to a fascinating fact: quite often the answer to this problem depends less on the speech model than on where the audio came from in the first place.</p>
+
+      <p>Three separate systems hide inside the word <em>transcription</em>:</p>
+
+      <ul class="question-list">
+        <li><strong>What was said?</strong> - speech recognition</li>
+        <li><strong>Who spoke when?</strong> - diarization</li>
+        <li><strong>Who is that person?</strong> - identity resolution</li>
+      </ul>
+    </section>
+
+    <section id="section-capture">
+      <h2>Where did the audio come from?</h2>
+
+      <p>During a Zoom, Meet or Teams call, each person sends their own microphone audio separately to the meeting platform. Paul's voice and Jessica's voice therefore begin as separate audio streams. The platform then delivers those streams to the other participants, and on your computer they are usually combined into one audio output so that you simply hear the whole conversation.</p>
+
+      <p>A conversation-intelligence product has to get a copy of that audio somewhere along the way. Whether the audio is received before or after the mix determines how easy or hard it is to diarize.</p>
+
+      <p>If it is captured after the mix, you get one blended track. Paul and Jessica are combined, so the system has to work out who spoke from the sound alone.</p>
+
+      <p>Capture closer to the meeting platform and you may get more structure: separate participant audio, participant IDs, or metadata about who was speaking. For example, in Zoom's Real-Time Media Streams, audio can arrive already associated with a participant ID and name.</p>
+
+      <p>So sometimes speaker identity has to be inferred, while in other cases the meeting platform already provides it.</p>
+
+      <h3>Common ways</h3>
+
+      <ol class="step-list">
+        <li><strong>Meeting bot.</strong> Joins the call as a participant and records what its client can reach. Depending on how it joins, that may be mixed audio or richer meeting media. It also has to be let in: audio from before it was admitted does not exist anywhere downstream.
+          <div class="callout in-list">
+            <p><strong>Good to know:</strong> This makes bot join time and waiting-room time useful operational metrics when evaluating a conversation-intelligence product.</p>
+            <p>Infrastructure providers such as Recall.ai handle much of this bot lifecycle for developers: scheduling bots in advance, tracking states such as joining, waiting room and recording, and providing controls for how long bots should wait before leaving.</p>
+          </div>
+        </li>
+        <li><strong>Desktop capture.</strong> Records audio directly from a participant's computer, typically using the microphone and system audio. The trade-off is that remote participants may arrive through the computer's system audio rather than as separate participant streams. The product may therefore need additional speaker information or diarization to work out who said what.
+          <div class="callout in-list">
+            <p>Products such as Granola and Wispr Flow Notetaker use this bot-free approach, so they can work across meeting platforms without joining the call as a participant.</p>
+          </div>
+        </li>
+        <li><strong>Native media API.</strong> Receives media directly from the meeting platform, like Zoom RTMS. Where the platform supplies participant attribution, identity becomes a lookup rather than an acoustic guess.</li>
+      </ol>
+
+      <figure class="figure" id="fig-tap">
+        <div class="figure-label">Figure 1 - Where did you tap into the call?</div>
+        <div class="figure-canvas-wrap"><svg id="f1svg" viewBox="0 0 640 342" role="img" aria-labelledby="f1title"><title id="f1title">What the application receives at the selected capture point</title></svg></div>
+        <p class="swipe">Figure scrolls sideways &rarr;</p>
+        <div class="figure-controls" role="tablist" aria-label="Capture point">
+          <span class="ctrl-label">Tap point</span>
+          <button class="ctrl-btn" role="tab" aria-selected="true" data-i="0">After the mix</button>
+          <button class="ctrl-btn" role="tab" aria-selected="false" data-i="1">Desktop capture</button>
+          <button class="ctrl-btn" role="tab" aria-selected="false" data-i="2">Participant-attributed</button>
+        </div>
+        <div class="figure-ledger" id="f1ledger"></div>
+        <div class="figure-readout" id="f1pay"></div>
+        <figcaption class="figure-caption"><strong>Capture architecture decides what the models still have to guess.</strong> The ribbon shows who actually spoke; the track beneath it shows what the recording itself can tell apart. Nothing downstream can add information the tap point discarded.</figcaption>
+      </figure>
+    </section>
+
+    <section id="section-diarization">
+      <h2>If all you have is one recording</h2>
+
+      <p>Let's understand a very common case: the audio arrived after the mix, and it is all you have. Paul and Jessica are now part of the same audio track, and the system has to separate their voices from the sound itself.</p>
+
+      <p>A recording is a long list of numbers, each describing how hard the air pushed at one instant, thousands of times a second. There is no field for a person, and nothing marks where one speaker stops. A human in the room separates the voices easily, using direction and eyesight - neither of which is available in our mixed audio.</p>
+
+      <p>This is the audio that diarization has to work on. It answers one question - who spoke when - and broadly runs in four steps.</p>
+
+      <ol class="step-list">
+        <li><strong>Find the speech.</strong> A voice-activity detector marks where speech exists and discards silence, keyboard clatter and the dog next door. It finds speech, not speakers.</li>
+        <li><strong>Cut it up.</strong> What remains is divided into short regions. The cuts do not fall neatly at speaker changes, because where the speaker changes is exactly what is not yet known.</li>
+        <li><strong>Represent each region.</strong> A speaker-embedding model turns each region into a numerical representation of how the voice sounds. Segments from the same speaker tend to produce more similar representations than segments from different speakers.</li>
+        <li><strong>Group them.</strong> The system groups the similar ones together. The number of groups is how many people it believes were talking.</li>
+      </ol>
+
+      <p>The result is not Paul and Jessica. It is <code>SPEAKER_00</code> and <code>SPEAKER_01</code>.</p>
+
+      <figure class="figure" id="fig-diarize">
+        <div class="figure-label">Figure 2 - Two voices, still no names</div>
+        <div class="figure-canvas-wrap"><svg id="f2svg" viewBox="0 0 640 290" role="img" aria-labelledby="f2title"><title id="f2title">Diarization stepped through: raw audio, speech detection, embeddings, clustering</title></svg></div>
+        <p class="swipe">Figure scrolls sideways &rarr;</p>
+        <div class="figure-controls">
+          <button class="ctrl-btn primary" id="f2next">Find the speech</button>
+          <button class="ctrl-btn" id="f2reset">Reset</button>
+          <span class="stepdots" id="f2dots" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+        </div>
+        <div class="figure-readout" id="f2pay"></div>
+        <figcaption class="figure-caption">This is a simplified 2D view of speaker embeddings. In reality, they have many more dimensions. The key idea is simple: segments from the same voice tend to sit closer together. The overlap sits between the two groups because it contains both speakers.</figcaption>
+      </figure>
+      <p>Overlap in speaking is where a single mixed track causes maximum errors. Clustering gives each region one label, so when two people talk at once it has to pick a winner, and the other person's words vanish or land under the wrong name.</p>
+
+      <div class="callout">
+        <p><strong>Does quality of diarization still matter?</strong></p>
+        <p>Different transcription providers make different trade-offs here. Deepgram, AssemblyAI and others each run their own diarization models, and the differences are real: how much speech they need before they can confidently separate a speaker, how well they handle short interjections, overlapping speech, noisy calls or phone-quality audio, and how quickly speaker labels stabilise in a live transcript.</p>
+        <p>So diarization is not just a checkbox in a transcription API. If speaker attribution matters to your product, the quality of this layer is something worth evaluating.</p>
+      </div>
+    </section>
+
+    <section id="section-identity">
+      <h2>Names are not in the waveform</h2>
+
+      <p>Even perfect diarization only gives us anonymous speakers. Nothing in Jessica's voice contains the string "Jessica." A name cannot be recovered from the waveform alone.</p>
+
+      <p>To get a real name, the system needs another source of identity.</p>
+
+      <p>The cleanest case is <strong>participant metadata</strong>. If the meeting platform says <code>user_id: 42</code> is Jessica, and the audio is associated with that ID, the system can simply map the audio to her name. No voice recognition is needed.</p>
+
+      <p>If the audio is mixed, the system may instead use <strong>active-speaker metadata</strong> from the meeting platform and align those timestamps with the diarized turns: the stretches of the conversation assigned to each anonymous speaker.</p>
+
+      <div class="callout">
+        <p>A third option is <strong>voice identification</strong>: comparing an unknown voice with a stored reference recording of a known person. This requires prior enrollment. Zoom's Smart Name Tags is one example: users can enroll a voice recording so Zoom can recognise them as speakers later. This is different from diarization, because the system is matching the voice against a known person rather than merely grouping similar speech together.</p>
+      </div>
+
+      <p>So turning Speaker 2 into Jessica can be a lookup, an alignment, or a voice match - depending on what information survived when the meeting was captured.</p>
+
+      <figure class="figure" id="fig-identity">
+        <div class="figure-label">Figure 3 - Turn Speaker 2 into Jessica</div>
+        <div class="figure-canvas-wrap"><svg id="f3svg" viewBox="0 0 640 210" role="img" aria-labelledby="f3title"><title id="f3title">Evidence used by the selected route to resolve Speaker 2 to Jessica</title></svg></div>
+        <p class="swipe">Figure scrolls sideways &rarr;</p>
+        <div class="figure-controls" role="tablist" aria-label="Identity source">
+          <span class="ctrl-label">Identity source</span>
+          <button class="ctrl-btn" role="tab" aria-selected="true" data-i="0">Participant ID</button>
+          <button class="ctrl-btn" role="tab" aria-selected="false" data-i="1">Active-speaker timeline</button>
+          <button class="ctrl-btn" role="tab" aria-selected="false" data-i="2">Voice match</button>
+          <button class="ctrl-btn" role="tab" aria-selected="false" data-i="3">Nothing available</button>
+        </div>
+        <div class="transcript" id="f3trans"></div>
+        <div class="figure-readout" id="f3pay"></div>
+        <figcaption class="figure-caption"><strong>The words never changed. The evidence available for identity did.</strong> With participant metadata, Jessica is a lookup. Without it, the system may be left with an anonymous speaker.</figcaption>
+      </figure>
+    </section>
+
+    <section id="section-asr">
+      <h2>What speech-to-text does, and does not do</h2>
+
+      <p>Speech recognition turns audio into words and timestamps. It is a separate problem from diarization and speaker identity.</p>
+
+      <p>It also predates generative AI by decades. Modern systems evolved from older statistical speech-recognition methods to neural and Transformer-based models, with systems like Whisper making high-quality multilingual transcription much more accessible.</p>
+
+      <p>For this article, the key point is simple: generative AI did not invent transcription. It mainly changed what products could do with the transcript afterwards.</p>
+    </section>
+
+    <section id="section-stakes">
+      <h2>A wrong name produces a fluent wrong answer</h2>
+
+      <p>For many downstream CI applications, an LLM reads the transcript and generates something a user may act on: a summary, an answer, a next step, or a recommendation.</p>
+
+      <div class="callout">
+        <p><strong>Jessica:</strong> November is more realistic.</p>
+        <p>&rarr; <strong>Timeline risk:</strong> the customer now expects a November deployment.</p>
+      </div>
+
+      <p>If Jessica's sentence is incorrectly attributed to Paul, the output can still sound completely reasonable. The business meaning, however, may be reversed: the vendor now appears to be proposing November instead of the customer.</p>
+
+      <p>A missing word is easy to notice, but a sentence attributed to the wrong person is harder to catch.</p>
+
+      <p>Every downstream insight inherits the mistakes made upstream. A better LLM cannot recover audio that was never captured, and perfect speech recognition cannot fix the wrong speaker attached to a sentence.</p>
+
+      <figure class="figure" id="fig-stack">
+        <div class="figure-label">The whole chain, from microphone to named transcript</div>
+        <div class="figure-canvas-wrap"><svg id="f4svg" viewBox="0 0 640 152" role="img" aria-labelledby="f4title"><title id="f4title">The six stages between Jessica speaking and a speaker-attributed transcript line</title></svg></div>
+        <p class="swipe">Diagram scrolls sideways &rarr;</p>
+        <figcaption class="figure-caption">Every arrow is a place information can be lost, and nothing later in the chain can put it back. Capture is the stage that decides how much the two after it still have to work out.</figcaption>
+      </figure>
+    </section>
+
+    <section id="section-close">
+      <h2>Finding where the problem is</h2>
+
+      <p>So when a transcript says Speaker 2 instead of Jessica, the speech model may not be the problem at all. The issue could be how the audio was captured, whether speaker information survived, how diarization grouped the voices, or how identity was resolved.</p>
+
+      <p>That matters when you are debugging or improving a conversation-intelligence product. Before trying to improve the model, you need to understand which part of the pipeline actually failed.</p>
+
+      <p>Sometimes the fix is better transcription. Sometimes it is better diarization. And sometimes the real problem happened much earlier, when the audio or speaker metadata was captured.</p>
+
+      <p>To improve the output, you first need to know which layer to fix.</p>
+    </section>
+
+  </main>
+</div>
+
+<footer class="article-footer">
+  <h4>Sources</h4>
+  <ul class="sources-list">
+    <li>Zoom, <a href="https://developers.zoom.us/docs/rtms/meetings/media/">Real-Time Media Streams - media</a>: per-participant and merged audio, <code>user_id</code>/<code>user_name</code>/<code>timestamp</code> per packet, merged audio as <code>user_id: 0</code>, raw PCM (L16) 16&nbsp;kHz mono at 20&nbsp;ms intervals.</li>
+    <li>Microsoft, <a href="https://learn.microsoft.com/en-us/microsoftteams/platform/bots/calls-and-meetings/real-time-media-concepts">Real-time media concepts for Teams bots</a>: active vs dominant speakers, 20&nbsp;ms audio frames, and the recommendation against raw-media bots for AI agent scenarios.</li>
+    <li>Google, <a href="https://developers.google.com/workspace/meet/media-api/guides/overview">Meet Media API overview</a>: aggregated virtual streams from an SFU, participant attribution via the RTP CSRC value. Developer Preview.</li>
+    <li>Recall.ai, <a href="https://docs.recall.ai/docs/desktop-sdk">Desktop Recording SDK</a>: local recording with no bot in the call, plus participant join/leave and speaking-state events.</li>
+    <li><a href="https://huggingface.co/pyannote/speaker-diarization-3.1">pyannote/speaker-diarization-3.1</a>: segmentation plus embedding, optional speaker count, mono 16&nbsp;kHz, benchmarked with overlapped speech and no forgiveness collar.</li>
+    <li><a href="https://developers.deepgram.com/docs/diarization">Deepgram</a> and <a href="https://www.assemblyai.com/docs/speech-to-text/speaker-diarization">AssemblyAI</a> speaker diarization: provider-specific options and documented accuracy factors, including how much continuous speech a speaker needs and the effect of cross-talk and noise.</li>
+    <li>Bot-free desktop capture: <a href="https://www.granola.ai/blog/can-ai-listen-to-a-meeting-and-take-notes">Granola</a> and <a href="https://wisprflow.ai/notetaker">Wispr Flow Notetaker</a> both record microphone and system audio locally rather than joining the call as a participant.</li>
+    <li>Zoom, <a href="https://support.zoom.com/hc/en/article?id=zm_kb&amp;sysparm_article=KB0082578">enrolling a profile for automatic smart name tags</a>: voice enrollment used to recognise a known speaker, which is speaker identification rather than diarization.</li>
+    <li>Radford et al., <a href="https://arxiv.org/abs/2212.04356">Robust Speech Recognition via Large-Scale Weak Supervision</a> (Whisper), December 2022.</li>
+    <li>Architecture lineage referenced in passing: <a href="https://arxiv.org/abs/2006.11477">wav2vec 2.0</a> and <a href="https://arxiv.org/abs/2005.08100">Conformer</a>.</li>
+  </ul>
+  <p>Platform capabilities are a dated snapshot, checked September 2026; meeting APIs change quickly. This article describes general architecture and documented platform capabilities. It makes no claim about how any specific conversation-intelligence product captures audio or which models it runs. Paul and Jessica are fictional. Nothing here draws on any employer's internal systems.</p>
+  <p class="byline">By <a href="https://www.linkedin.com/in/ankitamathur10/"><strong>Ankita Mathur</strong></a> &middot; <a href="https://medium.com/@anki-mat">Medium</a></p>
+</footer>
+
+<script>
+
+(function(){
+"use strict";
+
+/* ---------------- shared helpers ---------------- */
+var NS = "http://www.w3.org/2000/svg";
+var C = {
+  ink:"rgba(0,0,0,0.8)", ink2:"rgba(0,0,0,0.54)", ink3:"rgba(0,0,0,0.38)",
+  rule:"rgba(0,0,0,0.12)", rule2:"rgba(0,0,0,0.05)", paper:"#FAF8F4", stage:"#FFFFFF",
+  accent:"#2563EB", accentSoft:"#EFF6FF",
+  paul:"#D97706", paulSoft:"#FEF3C7",
+  jess:"#7C3AED", jessSoft:"#F5F0FF",
+  slate:"#475569", slateSoft:"#E7EBF0",
+  warn:"#D97706"
+};
+
+function el(tag, attrs, parent){
+  var n = document.createElementNS(NS, tag);
+  if(attrs) for(var k in attrs) n.setAttribute(k, attrs[k]);
+  if(parent) parent.appendChild(n);
+  return n;
+}
+function tx(parent, x, y, s, a){
+  a = a || {};
+  var t = el("text", {x:x, y:y, "font-size":a.size||11, fill:a.fill||C.ink2,
+    "font-weight":a.weight||400, "text-anchor":a.anchor||"start",
+    "letter-spacing":a.ls||0, "font-family":a.mono?"'JetBrains Mono','Fira Code',monospace":"-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif"}, parent);
+  t.textContent = s;
+  return t;
+}
+function clear(svg){
+  var kids = [].slice.call(svg.childNodes);
+  for(var i=0;i<kids.length;i++){ if(kids[i].nodeName !== "title") svg.removeChild(kids[i]); }
+}
+function rng(seed){
+  var s = seed >>> 0;
+  return function(){ s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; };
+}
+function inAny(t, ranges){
+  for(var i=0;i<ranges.length;i++){ if(t >= ranges[i][0] && t <= ranges[i][1]) return true; }
+  return false;
+}
+
+/* speech layout of the 20s Paul/Jessica exchange, normalised 0..1 */
+var PAUL_ON = [[0.05,0.31],[0.55,0.70]];
+var JESS_ON = [[0.35,0.53],[0.74,0.97]];
+
+/* draw a bar waveform into g */
+function wave(g, x, y, w, h, seed, ranges, color, quiet){
+  var r = rng(seed), step = 3, n = Math.floor(w/step), mid = y + h/2;
+  for(var i=0;i<n;i++){
+    var t = i/(n-1);
+    var live = inAny(t, ranges);
+    var amp = live ? (0.30 + r()*0.70) : (0.03 + r()*0.05);
+    var hh = Math.max(1, amp * h/2);
+    el("rect", {x:(x+i*step).toFixed(1), y:(mid-hh).toFixed(1), width:2, height:(hh*2).toFixed(1),
+      rx:1, fill: live ? color : C.rule, opacity: live ? (quiet?0.45:1) : 1}, g);
+  }
+}
+
+/* ===================================================================
+   FIGURE 1 — Where did you tap into the call?
+   =================================================================== */
+var f1svg = document.getElementById("f1svg");
+var f1ledger = document.getElementById("f1ledger");
+var f1pay = document.getElementById("f1pay");
+var f1tabs = document.querySelectorAll("#fig-tap .ctrl-btn[data-i]");
+var f1mode = 0;
+
+var F1 = [
+  { tap:"Tap point: after the mix",
+    ledger:[
+      ["Words recoverable from this audio","given","Yes"],
+      ["Which turns came from the same speaker","infer","Must be inferred"],
+      ["Which real participant that is","none","No evidence in the audio"],
+      ["What was said","infer","Still needs ASR"]
+    ],
+    pay:"Who spoke has to be reconstructed from the sound alone. This is the case diarization exists for."
+  },
+  { tap:"Tap point: one participant's machine",
+    ledger:[
+      ["Words recoverable from this audio","given","Yes"],
+      ["Which turns came from the same speaker","infer","One source known, rest inferred"],
+      ["Which real participant that is","infer","Only the local user, by construction"],
+      ["What was said","infer","Still needs ASR"]
+    ],
+    pay:"One participant is known for free - whoever is at the keyboard. Everyone else arrives already mixed."
+  },
+  { tap:"Tap point: inside the session",
+    ledger:[
+      ["Words recoverable from this audio","given","Yes"],
+      ["Which turns came from the same speaker","given","Given by the stream"],
+      ["Which real participant that is","given","Given by ID and roster"],
+      ["What was said","infer","Still needs ASR"]
+    ],
+    pay:"Attribution arrived with the audio. The hardest downstream problem was solved before any model ran."
+  }
+];
+
+function f1draw(){
+  clear(f1svg);
+  var g = el("g", {}, f1svg);
+  var cfg = F1[f1mode];
+
+  /* --- left: participants --- */
+  tx(g, 14, 22, "IN THE MEETING", {size:9.5, fill:C.ink3, weight:600, ls:"0.1em"});
+  el("rect", {x:14, y:32, width:150, height:132, rx:9, fill:"#FDFCFA", stroke:C.rule}, g);
+
+  el("circle", {cx:44, cy:72, r:13, fill:C.paulSoft}, g);
+  tx(g, 44, 76, "P", {size:11.5, fill:C.paul, weight:600, anchor:"middle"});
+  tx(g, 66, 69, "Paul", {size:12.5, fill:C.ink, weight:600});
+  tx(g, 66, 83, f1mode===1 ? "at the keyboard" : "participant 17", {size:10, fill:C.ink3, mono:f1mode!==1});
+
+  el("circle", {cx:44, cy:124, r:13, fill:C.jessSoft}, g);
+  tx(g, 44, 128, "J", {size:11.5, fill:C.jess, weight:600, anchor:"middle"});
+  tx(g, 66, 121, "Jessica", {size:12.5, fill:C.ink, weight:600});
+  tx(g, 66, 135, f1mode===1 ? "remote" : "participant 42", {size:10, fill:C.ink3, mono:f1mode!==1});
+
+  /* --- middle: routing + tap line --- */
+  var tapX = 236;
+  el("line", {x1:tapX, y1:30, x2:tapX, y2:182, stroke:C.accent, "stroke-width":1.5,
+    "stroke-dasharray":"3 4", opacity:.85}, g);
+  tx(g, tapX, 198, cfg.tap, {size:10, fill:C.accent, weight:600, anchor:"middle"});
+
+  if(f1mode === 0){
+    el("path", {d:"M164 72 C 192 72, 186 98, 202 98", fill:"none", stroke:C.paul, "stroke-width":1.6}, g);
+    el("path", {d:"M164 124 C 192 124, 186 98, 202 98", fill:"none", stroke:C.jess, "stroke-width":1.6}, g);
+    el("circle", {cx:212, cy:98, r:11, fill:C.rule2, stroke:C.rule}, g);
+    tx(g, 212, 101, "+", {size:14, fill:C.ink2, weight:600, anchor:"middle"});
+    tx(g, 212, 124, "mixed", {size:9.5, fill:C.ink3, anchor:"middle"});
+    el("line", {x1:223, y1:98, x2:tapX, y2:98, stroke:C.ink3, "stroke-width":1.6}, g);
+  } else if(f1mode === 1){
+    el("line", {x1:164, y1:72, x2:tapX, y2:72, stroke:C.paul, "stroke-width":1.6}, g);
+    tx(g, 200, 65, "own mic", {size:9.5, fill:C.ink3, anchor:"middle"});
+    el("path", {d:"M164 124 C 186 124, 190 134, 202 134", fill:"none", stroke:C.jess, "stroke-width":1.6}, g);
+    el("circle", {cx:212, cy:134, r:11, fill:C.rule2, stroke:C.rule}, g);
+    tx(g, 212, 137, "+", {size:14, fill:C.ink2, weight:600, anchor:"middle"});
+    tx(g, 212, 160, "system audio", {size:9.5, fill:C.ink3, anchor:"middle"});
+    el("line", {x1:223, y1:134, x2:tapX, y2:134, stroke:C.ink3, "stroke-width":1.6}, g);
+  } else {
+    el("line", {x1:164, y1:72, x2:tapX, y2:72, stroke:C.paul, "stroke-width":1.6}, g);
+    el("line", {x1:164, y1:124, x2:tapX, y2:124, stroke:C.jess, "stroke-width":1.6}, g);
+    tx(g, 200, 65, "kept apart", {size:9.5, fill:C.ink3, anchor:"middle"});
+  }
+
+  /* --- right: what arrives --- */
+  var x0 = 268, w = 358;
+  tx(g, x0, 22, "WHAT THE APPLICATION RECEIVES", {size:9.5, fill:C.ink3, weight:600, ls:"0.1em"});
+  el("rect", {x:x0, y:32, width:w, height:150, rx:9, fill:C.paper, stroke:C.rule}, g);
+
+  if(f1mode === 0){
+    tx(g, x0+16, 58, "audio.wav", {size:12, fill:C.ink, weight:500, mono:true});
+    tx(g, x0+16, 74, "one channel · 20 s · no attribution", {size:10, fill:C.ink3});
+    wave(el("g", {}, g), x0+16, 86, w-32, 48, 7, PAUL_ON.concat(JESS_ON), C.ink2);
+    tx(g, x0+16, 152, "Two voices and the room, blended into a single channel.", {size:10.5, fill:C.ink2});
+    tx(g, x0+16, 170, "Who is who: not represented.", {size:10.5, fill:C.warn, weight:500});
+  } else if(f1mode === 1){
+    tx(g, x0+16, 56, "microphone", {size:11, fill:C.paul, weight:600, mono:true});
+    tx(g, x0+120, 56, "the local participant", {size:10, fill:C.ink3});
+    wave(el("g",{},g), x0+16, 62, w-32, 30, 11, PAUL_ON, C.paul);
+    tx(g, x0+16, 112, "system audio", {size:11, fill:C.ink2, weight:600, mono:true});
+    tx(g, x0+132, 112, "everyone else, summed", {size:10, fill:C.ink3});
+    wave(el("g",{},g), x0+16, 118, w-32, 30, 23, JESS_ON, C.ink2);
+    tx(g, x0+16, 170, "Two channels, one certainty: the person holding the laptop.", {size:10.5, fill:C.ink2});
+  } else {
+    var rows = [
+      {id:"17", nm:"Paul",    col:C.paul, soft:C.paulSoft, on:PAUL_ON, ts:"00:14:12"},
+      {id:"42", nm:"Jessica", col:C.jess, soft:C.jessSoft, on:JESS_ON, ts:"00:14:17"}
+    ];
+    for(var i=0;i<rows.length;i++){
+      var R = rows[i], ry = 46 + i*62;
+      el("rect", {x:x0+14, y:ry, width:w-28, height:52, rx:7, fill:C.stage, stroke:C.rule}, g);
+      el("rect", {x:x0+14, y:ry, width:3.5, height:52, rx:1.5, fill:R.col}, g);
+      tx(g, x0+28, ry+18, "user_id: " + R.id, {size:11, fill:R.col, weight:500, mono:true});
+      tx(g, x0+118, ry+18, "user_name: " + R.nm, {size:11, fill:C.ink2, mono:true});
+      tx(g, x0+w-42, ry+18, R.ts, {size:10, fill:C.ink3, mono:true, anchor:"end"});
+      wave(el("g",{},g), x0+28, ry+24, w-70, 22, 31+i*13, R.on, R.col);
+    }
+    tx(g, x0+16, 176, "Every packet already says whose microphone it came from.", {size:10.5, fill:C.ink2});
+  }
+
+  /* --- what ended up in the recording --- */
+  var LAB = 88, TX0 = 96, TX1 = 626, TW = TX1 - TX0;
+  tx(g, 14, 228, "WHAT ENDED UP IN THE RECORDING", {size:9.5, fill:C.ink3, weight:600, ls:"0.1em"});
+
+  var truth = [];
+  for(var a=0;a<PAUL_ON.length;a++) truth.push({r:PAUL_ON[a], who:0});
+  for(var b=0;b<JESS_ON.length;b++) truth.push({r:JESS_ON[b], who:1});
+  for(var t=0;t<truth.length;t++){
+    var T = truth[t], gx = TX0 + T.r[0]*TW, gw = (T.r[1]-T.r[0])*TW, gc = T.who===0 ? C.paul : C.jess;
+    el("rect", {x:gx.toFixed(1), y:248, width:gw.toFixed(1), height:7, rx:3, fill:gc, opacity:.75}, g);
+    tx(g, gx+gw/2, 244, T.who===0 ? "Paul" : "Jessica", {size:8, fill:gc, anchor:"middle", weight:600});
+  }
+  tx(g, LAB, 255, "actually spoke", {size:8.4, fill:C.ink3, anchor:"end"});
+
+  if(f1mode === 0){
+    el("rect", {x:TX0, y:272, width:TW, height:40, rx:5, fill:C.paper, stroke:C.rule}, g);
+    wave(el("g",{},g), TX0+2, 274, TW-4, 36, 41, PAUL_ON.concat(JESS_ON), C.ink2);
+    tx(g, LAB, 295, "one mixed track", {size:8.4, fill:C.ink3, weight:600, anchor:"end"});
+  } else {
+    var lanes = (f1mode === 1)
+      ? [{lab:"microphone",   on:PAUL_ON, col:C.paul, bg:C.paulSoft},
+         {lab:"system audio", on:JESS_ON, col:C.ink2, bg:C.rule2}]
+      : [{lab:"Paul",    on:PAUL_ON, col:C.paul, bg:C.paulSoft},
+         {lab:"Jessica", on:JESS_ON, col:C.jess, bg:C.jessSoft}];
+    for(var k=0;k<2;k++){
+      var L2 = lanes[k], ly = 272 + k*22;
+      el("rect", {x:TX0, y:ly, width:TW, height:18, rx:4, fill:L2.bg, opacity:.55}, g);
+      wave(el("g",{},g), TX0+2, ly, TW-4, 18, 51+k*17, L2.on, L2.col);
+      tx(g, LAB, ly+12, L2.lab, {size:8.4, fill:L2.col, weight:600, anchor:"end"});
+    }
+  }
+
+  for(var sec=0; sec<=20; sec+=5){
+    var sx2 = TX0 + (sec/20)*TW;
+    el("line", {x1:sx2, y1:318, x2:sx2, y2:322, stroke:C.rule}, g);
+    tx(g, sx2, 333, sec+" s", {size:8.4, fill:C.ink3, mono:true,
+      anchor: sec===0 ? "start" : (sec===20 ? "end" : "middle")});
+  }
+
+  /* ledger */
+  var html = "";
+  for(var j=0;j<cfg.ledger.length;j++){
+    var L = cfg.ledger[j];
+    var mark = L[1]==="given" ? "&#10003;" : (L[1]==="infer" ? "?" : "&#8212;");
+    html += '<div class="lrow"><span class="lq">'+L[0]+'</span>'+
+            '<span class="lv '+L[1]+'"><span class="dot">'+mark+'</span>'+L[2]+'</span></div>';
+  }
+  f1ledger.innerHTML = html;
+  f1pay.innerHTML = cfg.pay;
+}
+
+for(var i1=0;i1<f1tabs.length;i1++){
+  f1tabs[i1].addEventListener("click", function(){
+    f1mode = +this.getAttribute("data-i");
+    for(var k=0;k<f1tabs.length;k++) f1tabs[k].setAttribute("aria-selected", k===f1mode ? "true":"false");
+    f1draw();
+  });
+}
+f1draw();
+
+/* ===================================================================
+   FIGURE 2 — Two voices, still no names
+   =================================================================== */
+var f2svg  = document.getElementById("f2svg");
+var f2next = document.getElementById("f2next");
+var f2reset= document.getElementById("f2reset");
+var f2dots = document.getElementById("f2dots").children;
+var f2pay  = document.getElementById("f2pay");
+var f2step = 0;
+
+var DUR = 12, X0 = 26, X1 = 614, PX = (X1-X0)/DUR;
+var REG = [
+  {a:0.4,  b:2.4,  who:0, tag:"1",       sx:0.24, sy:0.32},
+  {a:2.9,  b:4.9,  who:1, tag:"2",       sx:0.76, sy:0.66},
+  {a:5.3,  b:6.3,  who:2, tag:"overlap", sx:0.52, sy:0.49},
+  {a:6.8,  b:8.6,  who:0, tag:"3",       sx:0.30, sy:0.60},
+  {a:9.1,  b:11.5, who:1, tag:"4",       sx:0.82, sy:0.38}
+];
+var SPK = [C.accent, C.slate];
+var F2LABEL = ["Find the speech","Compare the voices","Group them","Grouped"];
+var F2PAY = [
+  "One channel, two people. Nothing here marks where one voice ends.",
+  "Speech found - not speakers. A voice-activity detector cannot tell you how many people are here.",
+  "Each region is now a point. The same voice tends to land nearer itself.",
+  "<strong>Two speakers found. Still no names.</strong>"
+];
+
+function f2ranges(){
+  var out = [];
+  for(var i=0;i<REG.length;i++) out.push([REG[i].a/DUR, REG[i].b/DUR]);
+  return out;
+}
+function sx(v){ return 46 + v * 552; }
+function sy(v){ return 136 + v * 132; }
+
+function f2draw(){
+  clear(f2svg);
+  var g = el("g", {}, f2svg);
+  var s = f2step;
+  f2svg.setAttribute("viewBox", "0 0 640 " + (s < 2 ? 128 : 290));
+
+  tx(g, X0, 18, s===0 ? "12 SECONDS OF MIXED AUDIO" : "AUDIO TIMELINE",
+     {size:9.5, fill:C.ink3, weight:600, ls:"0.1em"});
+
+  /* strip */
+  el("rect", {x:X0-6, y:28, width:(X1-X0)+12, height:56, rx:7, fill:C.paper, stroke:C.rule}, g);
+  wave(el("g",{},g), X0, 32, X1-X0, 48, 97, f2ranges(), s===0 ? C.ink2 : C.ink3, s>0);
+
+  /* region overlays from step 1 */
+  if(s >= 1){
+    for(var i=0;i<REG.length;i++){
+      var R = REG[i];
+      var rx = X0 + R.a*PX, rw = (R.b-R.a)*PX;
+      var col = (s>=3) ? (R.who===2 ? SPK[0] : SPK[R.who]) : C.accent;
+      el("rect", {x:rx.toFixed(1), y:32, width:rw.toFixed(1), height:48, rx:4,
+        fill:col, opacity:(s>=3 && R.who===2) ? .16 : .17,
+        stroke:col, "stroke-width":(s>=3 && R.who===2) ? 1.2 : 0,
+        "stroke-dasharray":(s>=3 && R.who===2) ? "3 3" : "0"}, g);
+      wave(el("g",{},g), rx+1, 34, Math.max(4, rw-2), 44, 41+i*7, [[0,1]], col);
+
+      if(s >= 3){
+        var lbl = R.who===2 ? "SPEAKER_00 ?" : (R.who===0 ? "SPEAKER_00" : "SPEAKER_01");
+        tx(g, rx + rw/2, 98, lbl, {size:8.6, fill:col, weight:500, anchor:"middle", mono:true});
+      } else if(s === 1){
+        tx(g, rx + rw/2, 98, R.tag, {size:8.6, fill:C.accent, anchor:"middle", weight:500});
+      }
+    }
+    if(s === 1) tx(g, X0, 116, "Five speech regions found. Four turns, and one stretch where both people talk.", {size:10.5, fill:C.ink2});
+  } else {
+    tx(g, X0, 100, "One waveform. Two people. The seams are not visible, and that is the point.", {size:10.5, fill:C.ink2});
+  }
+
+  /* scatter from step 2 */
+  if(s >= 2){
+    tx(g, X0, 122, s>=3 ? "GROUPED BY SIMILARITY" : "EACH REGION AS A POINT  ·  SIMPLIFIED TO TWO DIMENSIONS",
+       {size:9.5, fill:C.ink3, weight:600, ls:"0.1em"});
+    el("rect", {x:X0-6, y:130, width:(X1-X0)+12, height:146, rx:7, fill:"#FDFCFA", stroke:C.rule}, g);
+
+    if(s >= 3){
+      el("ellipse", {cx:sx(0.265), cy:sy(0.44), rx:86, ry:52, fill:SPK[0], opacity:.09}, g);
+      el("ellipse", {cx:sx(0.785), cy:sy(0.55), rx:80, ry:52, fill:SPK[1], opacity:.09}, g);
+      tx(g, sx(0.265), sy(0.44)-60, "SPEAKER_00", {size:9.5, fill:SPK[0], weight:600, anchor:"middle", mono:true});
+      tx(g, sx(0.785), sy(0.55)-60, "SPEAKER_01", {size:9.5, fill:SPK[1], weight:600, anchor:"middle", mono:true});
+    }
+
+    for(var j=0;j<REG.length;j++){
+      var Q = REG[j], cx = sx(Q.sx), cy = sy(Q.sy);
+      var dc = (s>=3) ? (Q.who===2 ? SPK[0] : SPK[Q.who]) : C.ink3;
+      if(s>=3 && Q.who===2){
+        el("circle", {cx:cx, cy:cy, r:13, fill:"none", stroke:C.warn, "stroke-width":1.2, "stroke-dasharray":"3 3"}, g);
+      }
+      el("circle", {cx:cx, cy:cy, r:7.5, fill:dc, opacity:(s>=3 && Q.who===2)?.55:1}, g);
+      tx(g, cx, cy-15, Q.tag, {size:8.6, fill:C.ink3, anchor:"middle"});
+    }
+
+    if(s >= 3){
+      el("line", {x1:sx(0.51), y1:sy(0.47)+15, x2:sx(0.51), y2:262, stroke:C.warn,
+        "stroke-width":1, "stroke-dasharray":"2 3"}, g);
+      tx(g, sx(0.51), 272, "resembles both - clustering must still pick one",
+         {size:9.6, fill:C.warn, anchor:"middle", weight:500});
+    } else {
+      tx(g, X0, 292, "", {size:10});
+    }
+  }
+
+  for(var d=0; d<f2dots.length; d++) f2dots[d].className = d <= s ? "on" : "";
+  f2next.textContent = F2LABEL[Math.min(s,3)];
+  f2next.disabled = (s >= 3);
+  f2pay.innerHTML = F2PAY[s];
+}
+
+f2next.addEventListener("click", function(){ if(f2step<3){ f2step++; f2draw(); } });
+f2reset.addEventListener("click", function(){ f2step = 0; f2draw(); });
+f2draw();
+
+/* ===================================================================
+   FIGURE 3 — Turn Speaker 1 into Jessica
+   =================================================================== */
+var f3svg = document.getElementById("f3svg");
+var f3trans = document.getElementById("f3trans");
+var f3pay = document.getElementById("f3pay");
+var f3tabs = document.querySelectorAll("#fig-identity .ctrl-btn[data-i]");
+var f3mode = 0;
+
+var st = document.createElement("style");
+st.textContent = "@keyframes nameIn{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}"+
+                 "#f3trans .tname,#f3trans .tmeta{animation:nameIn .34s ease both}";
+document.head.appendChild(st);
+
+var F3PAY = [
+  "Identity is metadata here, not a guess. Nothing in this route ever examined how the voice sounded.",
+  "The name came from the platform&rsquo;s own record of who was talking, matched on time alone.",
+  "The only route that infers identity from sound - and the only one that needs a stored voice profile.",
+  "Words: correct. Turns: correct. Names: impossible. This is what <code>Speaker 2</code> actually means."
+];
+var F3META = [
+  "Resolved from participant IDs carried on the media itself.",
+  "Resolved by aligning the platform&rsquo;s active-speaker timeline with diarized turns.",
+  "Resolved by comparing each turn against enrolled reference voices.",
+  "Unresolved - no identity source was available."
+];
+
+function card(g,x,y,w,h,label,dim){
+  el("rect", {x:x, y:y, width:w, height:h, rx:8, fill:dim?C.paper:C.stage, stroke:C.rule,
+    "stroke-dasharray":dim?"4 4":"0"}, g);
+  tx(g, x+13, y+19, label, {size:9, fill:C.ink3, weight:600, ls:"0.1em"});
+}
+function arrow(g,x,y,len){
+  len = len || 22;
+  el("path", {d:"M"+x+" "+y+" h "+len+" m -6 -4 l 6 4 l -6 4", fill:"none", stroke:C.ink3, "stroke-width":1.4}, g);
+}
+
+function f3draw(){
+  clear(f3svg);
+  var g = el("g", {}, f3svg);
+  var m = f3mode;
+
+  if(m === 0){
+    card(g, 16, 24, 190, 132, "INCOMING AUDIO PACKET");
+    wave(el("g",{},g), 30, 46, 162, 34, 55, [[0,1]], C.jess);
+    tx(g, 30, 104, "user_id: 42", {size:12, fill:C.jess, weight:500, mono:true});
+    tx(g, 30, 122, "user_name: Jessica", {size:10.5, fill:C.ink2, mono:true});
+    tx(g, 30, 140, "timestamp: 00:14:17", {size:10.5, fill:C.ink3, mono:true});
+    arrow(g, 214, 90);
+    card(g, 254, 24, 176, 132, "MEETING ROSTER");
+    el("rect", {x:266, y:52, width:152, height:32, rx:5, fill:C.paulSoft, opacity:.55}, g);
+    tx(g, 278, 72, "17  →  Paul", {size:11.5, fill:C.paul, weight:500, mono:true});
+    el("rect", {x:266, y:92, width:152, height:32, rx:5, fill:C.jessSoft}, g);
+    tx(g, 278, 112, "42  →  Jessica", {size:11.5, fill:C.jess, weight:600, mono:true});
+    tx(g, 266, 145, "authoritative, from the platform", {size:9.5, fill:C.ink3});
+    arrow(g, 438, 90);
+    el("rect", {x:478, y:56, width:146, height:68, rx:8, fill:C.jessSoft, stroke:C.jess}, g);
+    tx(g, 551, 88, "Jessica", {size:19, fill:C.jess, weight:600, anchor:"middle"});
+    tx(g, 551, 106, "no acoustic inference", {size:9.5, fill:C.jess, anchor:"middle", weight:500});
+    tx(g, 16, 182, "A lookup, not a judgement. The platform already knew.", {size:10.5, fill:C.ink2});
+
+  } else if(m === 1){
+    var a0 = 26, a1 = 614, ppx = (a1-a0)/DUR;
+    tx(g, a0, 22, "PLATFORM  ·  ACTIVE SPEAKER", {size:9, fill:C.ink3, weight:600, ls:"0.1em"});
+    for(var i=0;i<REG.length;i++){
+      var R = REG[i], bx = a0 + R.a*ppx, bw = (R.b-R.a)*ppx;
+      var isP = (R.who === 0), col = isP ? C.paul : C.jess;
+      el("rect", {x:bx.toFixed(1), y:32, width:bw.toFixed(1), height:30, rx:4, fill:col, opacity:.2}, g);
+      tx(g, bx+bw/2, 51, isP ? "Paul" : "Jessica", {size:9.6, fill:col, weight:600, anchor:"middle"});
+    }
+    tx(g, a0, 92, "DIARIZER  ·  ANONYMOUS LABELS", {size:9, fill:C.ink3, weight:600, ls:"0.1em"});
+    for(var k=0;k<REG.length;k++){
+      var S = REG[k], cxb = a0 + S.a*ppx, cwb = (S.b-S.a)*ppx;
+      var sc = S.who===1 ? SPK[1] : SPK[0];
+      el("rect", {x:cxb.toFixed(1), y:102, width:cwb.toFixed(1), height:30, rx:4, fill:sc, opacity:.18}, g);
+      tx(g, cxb+cwb/2, 121, S.who===1 ? "SPK_01" : "SPK_00", {size:8.8, fill:sc, weight:500, anchor:"middle", mono:true});
+      el("line", {x1:cxb+cwb/2, y1:64, x2:cxb+cwb/2, y2:100, stroke:S.who===2?C.warn:C.rule,
+        "stroke-width":1.2, "stroke-dasharray":"2 3"}, g);
+    }
+    var ox = a0 + REG[2].a*ppx, ow = (REG[2].b-REG[2].a)*ppx;
+    el("rect", {x:(ox-2).toFixed(1), y:28, width:(ow+4).toFixed(1), height:108, rx:5,
+      fill:"none", stroke:C.warn, "stroke-width":1.2, "stroke-dasharray":"3 3"}, g);
+    tx(g, ox+ow/2, 152, "both talking", {size:9.2, fill:C.warn, anchor:"middle", weight:500});
+    tx(g, a0, 178, "SPK_00 lines up with Paul, SPK_01 with Jessica - so the labels take those names.", {size:10.5, fill:C.ink2});
+    tx(g, a0, 196, "Where two people speak at once the platform names only one, and the match gets thin.", {size:10.5, fill:C.warn});
+
+  } else if(m === 2){
+    card(g, 16, 24, 210, 132, "ENROLLED REFERENCE");
+    el("circle", {cx:70, cy:88, r:20, fill:C.jessSoft}, g);
+    tx(g, 70, 94, "J", {size:16, fill:C.jess, weight:600, anchor:"middle"});
+    tx(g, 102, 82, "Jessica", {size:12.5, fill:C.ink, weight:600});
+    tx(g, 102, 98, "stored voice profile", {size:10, fill:C.ink3});
+    tx(g, 30, 140, "requires prior enrolment", {size:9.5, fill:C.warn, weight:500});
+
+    card(g, 250, 24, 190, 132, "UNKNOWN TURN");
+    wave(el("g",{},g), 264, 48, 162, 32, 71, [[0,1]], C.slate);
+    tx(g, 264, 104, "SPEAKER_01", {size:11.5, fill:C.slate, weight:500, mono:true});
+    tx(g, 264, 122, "00:14:17 – 00:14:22", {size:10, fill:C.ink3, mono:true});
+    tx(g, 264, 140, "no metadata attached", {size:9.5, fill:C.ink3});
+
+    card(g, 464, 24, 160, 132, "SIMILARITY");
+    tx(g, 544, 68, "0.81", {size:19, fill:C.jess, weight:600, anchor:"middle", mono:true});
+    el("rect", {x:480, y:82, width:128, height:9, rx:4.5, fill:C.rule2}, g);
+    el("rect", {x:480, y:82, width:104, height:9, rx:4.5, fill:C.jess}, g);
+    el("line", {x1:480+0.70*128, y1:75, x2:480+0.70*128, y2:98, stroke:C.warn, "stroke-width":1.4}, g);
+    tx(g, 480+0.70*128, 110, "threshold", {size:8.8, fill:C.warn, anchor:"middle"});
+    tx(g, 480, 132, "above threshold →", {size:10, fill:C.ink2});
+    tx(g, 480, 148, "accepted as Jessica", {size:10.5, fill:C.jess, weight:600});
+    tx(g, 16, 182, "A statistical match against a retained profile: a different task, with different consent obligations.", {size:10.5, fill:C.ink2});
+
+  } else {
+    var labels = ["MEETING ROSTER","ACTIVE-SPEAKER TIMELINE","ENROLLED VOICES"];
+    for(var q=0;q<3;q++){
+      var qx = 16 + q*204;
+      card(g, qx, 24, 190, 132, labels[q], true);
+      tx(g, qx+95, 96, "-", {size:24, fill:C.rule, anchor:"middle"});
+      tx(g, qx+95, 124, "not available", {size:10, fill:C.ink3, anchor:"middle"});
+    }
+    tx(g, 16, 182, "An uploaded file, or a capture that never sat inside the meeting session.", {size:10.5, fill:C.ink2});
+    tx(g, 16, 200, "The audio is all there is - and the audio does not contain names.", {size:10.5, fill:C.warn, weight:500});
+  }
+
+  var named = (m < 3);
+  var n0 = named ? "Paul" : "SPEAKER_00", n1 = named ? "Jessica" : "SPEAKER_01";
+  var c0 = named ? "p" : "anon", c1 = named ? "j" : "anon";
+  f3trans.innerHTML =
+    '<div class="trow"><span class="tname '+c0+'">'+n0+'</span><span class="ttext">Can your team deploy this by October?</span></div>'+
+    '<div class="trow"><span class="tname '+c1+'">'+n1+'</span><span class="ttext">October will be difficult. November is more realistic.</span></div>'+
+    '<p class="tmeta">'+F3META[m]+'</p>';
+  f3pay.innerHTML = F3PAY[m];
+}
+
+for(var i3=0;i3<f3tabs.length;i3++){
+  f3tabs[i3].addEventListener("click", function(){
+    f3mode = +this.getAttribute("data-i");
+    for(var k=0;k<f3tabs.length;k++) f3tabs[k].setAttribute("aria-selected", k===f3mode ? "true":"false");
+    f3draw();
+  });
+}
+f3draw();
+
+/* ============ STATIC — the whole chain ============ */
+var f4svg = document.getElementById("f4svg");
+var CHAIN = [
+  {t:"Jessica speaks",      s:"sound in a room"},
+  {t:"Media capture",       s:"user_id: 42"},
+  {t:"Speech recognition",  s:'"October will be…"'},
+  {t:"Speaker attribution", s:"SPEAKER_01"},
+  {t:"Identity resolution", s:"→ Jessica"},
+  {t:"Interpretation",      s:"Timeline risk: Nov"}
+];
+function chainDraw(){
+  clear(f4svg);
+  var g = el("g", {}, f4svg), BW = 190, GAP = 16, X = 16, ROWY = [26, 96];
+  for(var i=0;i<CHAIN.length;i++){
+    var col = i%3, row = Math.floor(i/3), x = X + col*(BW+GAP), y = ROWY[row];
+    var key = (i === 1);
+    el("rect", {x:x, y:y, width:BW, height:48, rx:6, fill:key?C.accentSoft:C.stage,
+      stroke:key?C.accent:C.rule, "stroke-width":key?1.5:1}, g);
+    tx(g, x+12, y+20, CHAIN[i].t, {size:9.8, weight:600, fill:key?C.accent:C.ink});
+    tx(g, x+12, y+35, CHAIN[i].s, {size:8.6, fill:C.ink3, mono:true});
+    if(col < 2) arrow(g, x+BW+2, y+24, 12);
+  }
+  var wx = X + 2*(BW+GAP) + BW/2, wy = ROWY[0] + 48;
+  el("path", {d:"M "+wx+" "+(wy+2)+" V "+(wy+11)+" H "+(X+BW/2)+" V "+(ROWY[1]-4)+
+    " m -4 -5 l 4 5 l 4 -5", fill:"none", stroke:C.rule, "stroke-width":1.2, "stroke-dasharray":"3 3"}, g);
+}
+chainDraw();
+
+/* ---------------- rail scrollspy ---------------- */
+var links = [].slice.call(document.querySelectorAll("#toc a"));
+var base  = links.map(function(a){ return a.className; });
+var heads = links.map(function(a){ return document.getElementById(a.getAttribute("href").slice(1)); });
+function spy(){
+  var best = 0;
+  for(var i=0;i<heads.length;i++){
+    if(heads[i] && heads[i].getBoundingClientRect().top < 140) best = i;
+  }
+  for(var j=0;j<links.length;j++){
+    links[j].className = (j===best) ? (base[j] ? base[j]+" active" : "active") : base[j];
+  }
+}
+if(links.length){
+  spy();
+  var tick = false;
+  window.addEventListener("scroll", function(){
+    if(tick) return; tick = true;
+    window.requestAnimationFrame(function(){ spy(); tick = false; });
+  }, {passive:true});
+}
+
+})();
+</script>
+</body>
+</html>
