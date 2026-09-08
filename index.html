@@ -102,28 +102,25 @@ h1 {
   display: block;
   position: relative;
 }
+.explainer-item.featured.primitives a { padding-bottom: 1.5rem; }
 .prims {
-  display: flex; gap: 10px;
-  margin-top: 1.15rem;
+  display: flex; flex-wrap: wrap;
+  gap: 0.35rem 1.5rem;
+  margin-top: 0.9rem;
 }
 .prims i {
-  flex: 1;
   font-family: var(--font-sans); font-style: normal;
-  font-size: 0.72rem; letter-spacing: 0.03em;
-  background: rgba(0, 0, 0, 0.22);
-  border-radius: 7px;
-  padding: 0.5rem 0.7rem;
-  display: flex; align-items: center; gap: 0.5rem;
-  white-space: nowrap;
+  font-size: 0.72rem; letter-spacing: 0.04em;
+  display: inline-flex; align-items: center; gap: 0.45rem;
 }
 .prims i::before {
   content: "";
-  width: 9px; height: 9px; border-radius: 3px;
+  width: 7px; height: 7px; border-radius: 2px;
   background: currentColor;
 }
-.prims i:nth-child(1) { color: rgba(255, 255, 255, 0.95); }
-.prims i:nth-child(2) { color: rgba(255, 255, 255, 0.86); }
-.prims i:nth-child(3) { color: rgba(255, 255, 255, 0.78); }
+.prims i:nth-child(1) { color: rgba(255, 255, 255, 1); }
+.prims i:nth-child(2) { color: rgba(255, 255, 255, 0.95); }
+.prims i:nth-child(3) { color: rgba(255, 255, 255, 0.92); }
 .explainer-item.featured.wave a {
   background: linear-gradient(135deg, #11472C 0%, #156443 50%, #0F7773 100%);
   padding-bottom: 4.4rem;
