@@ -102,6 +102,17 @@ h1 {
   display: block;
   position: relative;
 }
+.explainer-item.featured.chips a {
+  padding-bottom: 4.4rem;
+}
+.explainer-item.featured.chips a::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 54px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='54' preserveAspectRatio='none'%3E%3Crect x='16' y='16' width='88' height='22' rx='6' fill='none' stroke='%23FBBF24' stroke-width='1.6' stroke-dasharray='4 3' opacity='0.78'/%3E%3Crect x='113' y='16' width='72' height='22' rx='6' fill='none' stroke='%23FBBF24' stroke-width='1.6' stroke-dasharray='4 3' opacity='0.78'/%3E%3Crect x='194' y='16' width='72' height='22' rx='6' fill='none' stroke='%23FBBF24' stroke-width='1.6' stroke-dasharray='4 3' opacity='0.78'/%3E%3Crect x='275' y='16' width='88' height='22' rx='6' fill='none' stroke='%23FBBF24' stroke-width='1.6' stroke-dasharray='4 3' opacity='0.78'/%3E%3Crect x='372' y='16' width='72' height='22' rx='6' fill='none' stroke='%23FBBF24' stroke-width='1.6' stroke-dasharray='4 3' opacity='0.78'/%3E%3Crect x='453' y='16' width='72' height='22' rx='6' fill='%23C4B5FD' opacity='0.58'/%3E%3Crect x='534' y='16' width='88' height='22' rx='6' fill='%23C4B5FD' opacity='0.58'/%3E%3Crect x='631' y='16' width='72' height='22' rx='6' fill='%23C4B5FD' opacity='0.58'/%3E%3Crect x='712' y='16' width='72' height='22' rx='6' fill='%23C4B5FD' opacity='0.58'/%3E%3C/svg%3E") no-repeat center bottom / 100% 100%;
+  pointer-events: none;
+}
 .explainer-item.featured.wave a {
   background: linear-gradient(135deg, #11472C 0%, #156443 50%, #0F7773 100%);
   padding-bottom: 4.4rem;
@@ -155,7 +166,7 @@ footer a { color: var(--text-secondary); }
     </a>
   </li>
 
-  <li class="explainer-item featured">
+  <li class="explainer-item featured chips">
     <a href="./mcp-vs-rest/">
       <h2>What Actually Changes When You Put MCP in Front of Your REST API?</h2>
       <p>Less integration code for you to maintain, and less work for the model to figure out the call at runtime. The tool arrives already described.</p>
