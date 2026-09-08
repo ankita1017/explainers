@@ -294,13 +294,13 @@ ol.step-list li::before {
       <a href="#section-intro">Introduction</a>
       <a href="#section-capture">Where did the audio come from?</a>
       <a href="#fig-tap" class="sub">Where did you tap into the call?</a>
-      <a href="#section-diarization">Diarization: separating speakers</a>
+      <a href="#section-diarization">Diarization: separating speakers in mixed audio</a>
       <a href="#fig-diarize" class="sub">Two voices, still no names</a>
       <a href="#section-identity">Names are not in the waveform</a>
       <a href="#fig-identity" class="sub">Turn Speaker 2 into Jessica</a>
-      <a href="#section-asr">What speech-to-text does</a>
-      <a href="#section-stakes">Why a wrong name matters</a>
-      <a href="#section-close">When the transcript is wrong</a>
+      <a href="#section-asr">What speech-to-text does, and does not do</a>
+      <a href="#section-stakes">A wrong name produces a fluent wrong answer</a>
+      <a href="#section-close">When the transcript is wrong, where do you look?</a>
     </nav>
   </aside>
 
@@ -444,7 +444,7 @@ ol.step-list li::before {
 
       <p>There is still one problem: it does not know that Speaker 2 is Jessica.</p>
 
-      <p>Diarization groups speech by speaker. Turning an anonymous speaker into a real person requires another source of information.</p>
+      <p>Diarization groups speech by speaker. Turning an anonymous speaker into a real person requires another source of information. Nothing in Jessica's voice contains the string "Jessica." A name cannot be recovered from the waveform alone.</p>
 
       <p>The cleanest case is <strong>participant metadata</strong>. If the meeting platform says <code>user_id: 42</code> is Jessica, and the audio is associated with that ID, the system can simply map the audio to her name. No voice recognition is needed.</p>
 
