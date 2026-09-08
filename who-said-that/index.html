@@ -294,13 +294,13 @@ ol.step-list li::before {
       <a href="#section-intro">Introduction</a>
       <a href="#section-capture">Where did the audio come from?</a>
       <a href="#fig-tap" class="sub">Where did you tap into the call?</a>
-      <a href="#section-diarization">If all you have is one recording</a>
+      <a href="#section-diarization">Diarization: separating speakers</a>
       <a href="#fig-diarize" class="sub">Two voices, still no names</a>
       <a href="#section-identity">Names are not in the waveform</a>
       <a href="#fig-identity" class="sub">Turn Speaker 2 into Jessica</a>
       <a href="#section-asr">What speech-to-text does</a>
       <a href="#section-stakes">Why a wrong name matters</a>
-      <a href="#section-close">Finding where the problem is</a>
+      <a href="#section-close">When the transcript is wrong</a>
     </nav>
   </aside>
 
@@ -317,7 +317,7 @@ ol.step-list li::before {
     </header>
 
     <section id="section-intro">
-      <p class="lead">An accurate transcript, with notes and action items waiting the moment a call ends, has become almost mundane. Speech-to-text got good enough that most of us stopped thinking about the underlying method, which is not yet perfect, but good enough.</p>
+      <p class="lead">An accurate transcript, with notes and action items waiting the moment a call ends, has become almost mundane. Speech-to-text got good enough that most of us stopped wondering what happens underneath it.</p>
 
       <div class="transcript">
         <div class="trow"><span class="tname p">Paul</span><span class="ttext">Can your team deploy this by October?</span></div>
@@ -348,6 +348,8 @@ ol.step-list li::before {
 
     <section id="section-capture">
       <h2>Where did the audio come from?</h2>
+
+      <p>To understand how a system separates and identifies speakers, we first have to go one step backwards: what audio did it receive in the first place?</p>
 
       <p>During a Zoom, Meet or Teams call, each person sends their own audio to the meeting platform. Paul's voice and Jessica's voice therefore begin as separate audio streams. Your computer then plays the other participants' voices together, so you hear one combined conversation.</p>
 
@@ -393,13 +395,17 @@ ol.step-list li::before {
     </section>
 
     <section id="section-diarization">
-      <h2>If all you have is one recording</h2>
+      <h2>Diarization: separating speakers in mixed audio</h2>
 
-      <p>Let's understand a very common case: the audio arrived after the mix, and it is all you have. Paul and Jessica are now part of the same audio track, and the system has to separate their voices from the sound itself.</p>
+      <p>What happens next depends on what survived during capture. If the system receives participant-specific audio and metadata, some of the speaker information may already be available.</p>
+
+      <p>But a very common case is that the system receives one mixed recording. Paul and Jessica are now part of the same audio track, and the system has to separate their voices from the sound itself.</p>
+
+      <p>This is where diarization begins.</p>
 
       <p>A recording is a long list of numbers, each describing how hard the air pushed at one instant, thousands of times a second. There is no field for a person, and nothing marks where one speaker stops. A human in the room separates the voices easily, using direction and eyesight - neither of which is available in our mixed audio.</p>
 
-      <p>This is the audio that diarization has to work on. It answers one question - who spoke when - and broadly runs in four steps.</p>
+      <p>Diarization answers one question - who spoke when - and broadly runs in four steps.</p>
 
       <ol class="step-list">
         <li><strong>Find the speech.</strong> A voice-activity detector marks where speech exists and discards silence, keyboard clatter and the dog next door. It finds speech, not speakers.</li>
@@ -434,9 +440,11 @@ ol.step-list li::before {
     <section id="section-identity">
       <h2>Names are not in the waveform</h2>
 
-      <p>Even perfect diarization only gives us anonymous speakers. Nothing in Jessica's voice contains the string "Jessica." A name cannot be recovered from the waveform alone.</p>
+      <p>Suppose diarization works perfectly. The system has successfully separated the conversation into Speaker 1 and Speaker 2.</p>
 
-      <p>To get a real name, the system needs another source of identity.</p>
+      <p>There is still one problem: it does not know that Speaker 2 is Jessica.</p>
+
+      <p>Diarization groups speech by speaker. Turning an anonymous speaker into a real person requires another source of information.</p>
 
       <p>The cleanest case is <strong>participant metadata</strong>. If the meeting platform says <code>user_id: 42</code> is Jessica, and the audio is associated with that ID, the system can simply map the audio to her name. No voice recognition is needed.</p>
 
@@ -467,6 +475,8 @@ ol.step-list li::before {
 
     <section id="section-asr">
       <h2>What speech-to-text does, and does not do</h2>
+
+      <p>At this point, we have separated two different questions: who spoke when, and who that speaker actually is.</p>
 
       <p>Speech recognition turns audio into words and timestamps. It is a separate problem from diarization and speaker identity.</p>
 
@@ -500,9 +510,11 @@ ol.step-list li::before {
     </section>
 
     <section id="section-close">
-      <h2>Finding where the problem is</h2>
+      <h2>When the transcript is wrong, where do you look?</h2>
 
-      <p>So when a transcript says Speaker 2 instead of Jessica, the speech model may not be the problem at all. The issue could be how the audio was captured, whether speaker information survived, how diarization grouped the voices, or how identity was resolved.</p>
+      <p>That brings us back to the original question: why does one transcript say Jessica while another says Speaker 2?</p>
+
+      <p>The speech model may not be the problem at all. The issue could be how the audio was captured, whether speaker information survived, how diarization grouped the voices, or how identity was resolved.</p>
 
       <p>That matters when you are debugging or improving a conversation-intelligence product. Before trying to improve the model, you need to understand which part of the pipeline actually failed.</p>
 
