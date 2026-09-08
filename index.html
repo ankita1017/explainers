@@ -102,6 +102,9 @@ h1 {
   display: block;
   position: relative;
 }
+.explainer-item.featured.warm a {
+  background: linear-gradient(135deg, #78350F 0%, #9A3412 45%, #6D28D9 100%);
+}
 .explainer-item.featured a::before {
   content: "";
   position: absolute;
@@ -144,19 +147,19 @@ footer a { color: var(--text-secondary); }
 <p class="tagline">Interactive field notes, driven by curiosity and the joy of explaining things well, for people who build with these tools and want to know how they actually work.</p>
 
 <ul class="explainer-list">
+  <li class="explainer-item featured warm">
+    <a href="./who-said-that/">
+      <h2>Who Said That?</h2>
+      <p>Why does one meeting transcript say Jessica and another Speaker 2? The answer often depends less on the speech model than on where the audio was captured.</p>
+      <span class="meta">7 min read · 3 interactive figures</span>
+    </a>
+  </li>
+
   <li class="explainer-item featured">
     <a href="./mcp-vs-rest/">
       <h2>What Actually Changes When You Put MCP in Front of Your REST API?</h2>
       <p>Less integration code for you to maintain, and less work for the model to figure out the call at runtime. The tool arrives already described.</p>
       <span class="meta">10 min read · 3 interactive figures</span>
-    </a>
-  </li>
-
-  <li class="explainer-item">
-    <a href="./who-said-that/">
-      <h2>Who Said That?</h2>
-      <p>Why does one meeting transcript say Jessica and another Speaker 2? The answer often depends less on the speech model than on where the audio was captured.</p>
-      <span class="meta">7 min read · 3 interactive figures</span>
     </a>
   </li>
 </ul>
