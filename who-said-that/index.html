@@ -296,11 +296,11 @@ ol.step-list li::before {
       <a href="#fig-tap" class="sub">Where did you tap into the call?</a>
       <a href="#section-diarization">Diarization: separating speakers in mixed audio</a>
       <a href="#fig-diarize" class="sub">Two voices, still no names</a>
-      <a href="#section-identity">Names are not in the waveform</a>
+      <a href="#section-identity">Names are not in the audio</a>
       <a href="#fig-identity" class="sub">Turn Speaker 2 into Jessica</a>
       <a href="#section-asr">What speech-to-text does, and does not do</a>
       <a href="#section-stakes">A wrong name produces a fluent wrong answer</a>
-      <a href="#section-close">When the transcript is wrong, where do you look?</a>
+      <a href="#section-close">When the transcript is wrong, where to look?</a>
     </nav>
   </aside>
 
@@ -317,18 +317,20 @@ ol.step-list li::before {
     </header>
 
     <section id="section-intro">
-      <p class="lead">An accurate transcript, with notes and action items waiting the moment a call ends, has become almost mundane. Speech-to-text got good enough that most of us stopped wondering what happens underneath it.</p>
+      <p class="lead">An accurate transcript, with notes and action items waiting the moment a call ends, has become almost mundane. Speech-to-text got good enough that most people stopped wondering what happens underneath it.</p>
 
       <div class="transcript">
         <div class="trow"><span class="tname p">Paul</span><span class="ttext">Can your team deploy this by October?</span></div>
         <div class="trow"><span class="tname j">Jessica</span><span class="ttext">October will be difficult. November is more realistic.</span></div>
       </div>
 
-      <p>I recently spent time with the team responsible for how our conversation intelligence tool integrates with meeting providers like Zoom, Teams and Google Meet. I knew how audio is captured as streams and turned into text.</p>
+      <p>Few months back, I spent time with the team responsible for how our conversation intelligence (CI) product integrates with meeting providers like Zoom, Teams and Google Meet. I knew how audio is captured as streams and turned into text.</p>
 
-      <p>What I had never thought about was how that text gets split up by speakers at all, how the audio gets split where the voice changes, and the pieces grouped by whoever they sound like. That part has a name: <strong>diarization</strong>, derived from <em>diary</em>: a record of what happened, in order, with the time attached.</p>
+      <p>But what I had never thought about was how that text gets split up by speakers at all, how the audio gets split where the voice changes, and the pieces grouped by whoever they sound like.</p>
 
-      <p>But diarization only gets you this:</p>
+      <p>That part has a name: <strong>diarization</strong>, derived from <em>diary</em>: a record of what happened, in order, with the time attached.</p>
+
+      <p>But diarization gets as far as this:</p>
 
       <div class="transcript">
         <div class="trow"><span class="tname anon">Speaker 1</span><span class="ttext">Can your team deploy this by October?</span></div>
@@ -340,31 +342,27 @@ ol.step-list li::before {
       <p>Three separate systems hide inside the word <em>transcription</em>:</p>
 
       <ul class="question-list">
-        <li><strong>What was said?</strong> - speech recognition</li>
-        <li><strong>Who spoke when?</strong> - diarization</li>
-        <li><strong>Who is that person?</strong> - identity resolution</li>
+        <li><strong>What was said?</strong>: Speech recognition</li>
+        <li><strong>Who spoke when?</strong>: Diarization</li>
+        <li><strong>Who is that person?</strong>: Identity resolution</li>
       </ul>
     </section>
 
     <section id="section-capture">
       <h2>Where did the audio come from?</h2>
 
-      <p>To understand how a system separates and identifies speakers, we first have to go one step backwards: what audio did it receive in the first place?</p>
+      <p>To understand how a system separates and identifies speakers, we will have to go one step back and learn what audio did the CI tool receive in the first place.</p>
 
-      <p>During a Zoom, Meet or Teams call, each person sends their own audio to the meeting platform. Paul's voice and Jessica's voice therefore begin as separate audio streams. Your computer then plays the other participants' voices together, so you hear one combined conversation.</p>
+      <p>During a Zoom, Meet or Teams call, each person sends their own microphone audio to the meeting platform. Paul's voice and Jessica's voice therefore begin as separate audio streams. The meeting app then sends the other participants' audio to each participant's device, where their voices are played together as one conversation.</p>
 
-      <p>A conversation-intelligence product has to get a copy of that audio somewhere along the way. Whether the audio is received before or after the mix determines how easy or hard it is to diarize.</p>
+      <p>A conversation-intelligence product has to get access to that audio. Whether it receives one mixed track or participant-level audio determines how much diarization work is needed later. If it is captured after the mix, Paul and Jessica are combined, so the system has to work out who spoke from the sound alone.</p>
 
-      <p>If it is captured after the mix, you get one blended track. Paul and Jessica are combined, so the system has to work out who spoke from the sound alone.</p>
+      <p>Capturing closer to the meeting platform may preserve more structure: separate participant audio, participant IDs, or metadata about who was speaking. For example, in Zoom's Real-Time Media Streams, audio can arrive already associated with a participant ID and name.</p>
 
-      <p>Capture closer to the meeting platform and you may get more structure: separate participant audio, participant IDs, or metadata about who was speaking. For example, in Zoom's Real-Time Media Streams, audio can arrive already associated with a participant ID and name.</p>
-
-      <p>So sometimes speaker identity has to be inferred, while in other cases the meeting platform already provides it.</p>
-
-      <h3>Common ways</h3>
+      <h3>Common ways to get the audio</h3>
 
       <ol class="step-list">
-        <li><strong>Meeting bot.</strong> Joins the call as a participant and records what its client can reach. Depending on how it joins, that may be mixed audio or richer meeting media. It also has to be let in: audio from before it was admitted does not exist anywhere downstream.
+        <li><strong>Meeting bot.</strong> Joins the call as a participant and records the audio and meeting media available to it. What it receives depends on how the bot integrates with the meeting platform: some bots work with mixed audio, while integrations using richer media APIs may also receive speaker metadata or participant-level audio. It also has to be let in: audio from before it was admitted does not exist anywhere downstream.
           <div class="callout in-list">
             <p><strong>Good to know:</strong> This makes bot join time and waiting-room time useful operational metrics when evaluating a conversation-intelligence product.</p>
             <p>Infrastructure providers such as Recall.ai handle much of this bot lifecycle for developers: scheduling bots in advance, tracking states such as joining, waiting room and recording, and providing controls for how long bots should wait before leaving.</p>
@@ -372,7 +370,7 @@ ol.step-list li::before {
         </li>
         <li><strong>Desktop capture.</strong> Records audio directly from a participant's computer, typically using the microphone and system audio. The trade-off is that remote participants may arrive through the computer's system audio rather than as separate participant streams. The product may therefore need additional speaker information or diarization to work out who said what.
           <div class="callout in-list">
-            <p>Products such as Granola and Wispr Flow Notetaker use this bot-free approach, so they can work across meeting platforms without joining the call as a participant.</p>
+            <p><strong>Good to know:</strong> Products such as Granola and Wispr Flow use this bot-free approach, so they can work across meeting platforms (Teams, Zoom, etc.) without joining the call as a participant.</p>
           </div>
         </li>
         <li><strong>Native media API.</strong> Receives media directly from the meeting platform, like Zoom RTMS. Where the platform supplies participant attribution, identity becomes a lookup rather than an acoustic guess.</li>
@@ -403,9 +401,9 @@ ol.step-list li::before {
 
       <p>This is where diarization begins.</p>
 
-      <p>A recording is a long list of numbers, each describing how hard the air pushed at one instant, thousands of times a second. There is no field for a person, and nothing marks where one speaker stops. A human in the room separates the voices easily, using direction and eyesight - neither of which is available in our mixed audio.</p>
+      <p>A recording is a long list of numbers, each describing how hard the air pushed at one instant, thousands of times a second. There is no field for a person, and nothing marks where one speaker stops. A human in the room separates the voices easily, using direction and eyesight - neither of which is available in the mixed audio.</p>
 
-      <p>Diarization answers one question - who spoke when - and broadly runs in four steps.</p>
+      <p>Diarization answers one question - who spoke when. It broadly runs in four steps.</p>
 
       <ol class="step-list">
         <li><strong>Find the speech.</strong> A voice-activity detector marks where speech exists and discards silence, keyboard clatter and the dog next door. It finds speech, not speakers.</li>
@@ -426,7 +424,7 @@ ol.step-list li::before {
           <span class="stepdots" id="f2dots" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
         </div>
         <div class="figure-readout" id="f2pay"></div>
-        <figcaption class="figure-caption">This is a simplified 2D view of speaker embeddings. In reality, they have many more dimensions. The key idea is simple: segments from the same voice tend to sit closer together. The overlap sits between the two groups because it contains both speakers.</figcaption>
+        <figcaption class="figure-caption">This is a simplified 2D view of speaker embeddings. In reality, they have many more dimensions. Segments from the same voice tend to sit closer together. The overlap sits between the two groups because it contains both speakers.</figcaption>
       </figure>
       <p>Overlap in speaking is where a single mixed track causes maximum errors. Clustering gives each region one label, so when two people talk at once it has to pick a winner, and the other person's words vanish or land under the wrong name.</p>
 
@@ -438,20 +436,18 @@ ol.step-list li::before {
     </section>
 
     <section id="section-identity">
-      <h2>Names are not in the waveform</h2>
+      <h2>Names are not in the audio</h2>
 
       <p>Suppose diarization works perfectly. The system has successfully separated the conversation into Speaker 1 and Speaker 2.</p>
 
-      <p>There is still one problem: it does not know that Speaker 2 is Jessica.</p>
+      <p>There is still one problem: it does not know that Speaker 2 is Jessica. Nothing in Jessica's voice contains the string "Jessica." A name cannot be recovered from the waveform alone.</p>
 
-      <p>Diarization groups speech by speaker. Turning an anonymous speaker into a real person requires another source of information. Nothing in Jessica's voice contains the string "Jessica." A name cannot be recovered from the waveform alone.</p>
+      <p>The cleanest way is by using <strong>participant metadata</strong>. If the meeting platform says <code>user_id: 42</code> is Jessica, and the audio is associated with that ID, the system can simply map the audio to her name. No voice recognition is needed.</p>
 
-      <p>The cleanest case is <strong>participant metadata</strong>. If the meeting platform says <code>user_id: 42</code> is Jessica, and the audio is associated with that ID, the system can simply map the audio to her name. No voice recognition is needed.</p>
-
-      <p>If the audio is mixed, the system may instead use <strong>active-speaker metadata</strong> from the meeting platform and align those timestamps with the diarized turns: the stretches of the conversation assigned to each anonymous speaker.</p>
+      <p>If the audio is mixed, the system may instead use <strong>active-speaker metadata</strong> from the meeting platform and align those timestamps with the diarized turns. A turn is a stretch of the conversation assigned to each anonymous speaker.</p>
 
       <div class="callout">
-        <p>A third option is <strong>voice identification</strong>: comparing an unknown voice with a stored reference recording of a known person. This requires prior enrollment. Zoom's Smart Name Tags is one example: users can enroll a voice recording so Zoom can recognise them as speakers later. This is different from diarization, because the system is matching the voice against a known person rather than merely grouping similar speech together.</p>
+        <p>A third option is <strong>voice identification</strong>: comparing an unknown voice with a stored reference recording of a known person. This requires prior enrolment. Zoom's Smart Name Tags is one example: users can enrol a voice recording so Zoom can recognise them as speakers later. This is different from diarization, because the system is matching the voice against a known person rather than merely grouping similar speech together.</p>
       </div>
 
       <p>So turning Speaker 2 into Jessica can be a lookup, an alignment, or a voice match - depending on what information survived when the meeting was captured.</p>
@@ -476,13 +472,9 @@ ol.step-list li::before {
     <section id="section-asr">
       <h2>What speech-to-text does, and does not do</h2>
 
-      <p>At this point, we have separated two different questions: who spoke when, and who that speaker actually is.</p>
+      <p>At this point, two questions are separate: who spoke when, and who that speaker actually is. Speech recognition turns audio into words and timestamps. It solves a different problem from diarization and speaker identity.</p>
 
-      <p>Speech recognition turns audio into words and timestamps. It is a separate problem from diarization and speaker identity.</p>
-
-      <p>It also predates generative AI by decades. Modern systems evolved from older statistical speech-recognition methods to neural and Transformer-based models, with systems like Whisper making high-quality multilingual transcription much more accessible.</p>
-
-      <p>For this article, the key point is simple: generative AI did not invent transcription. It mainly changed what products could do with the transcript afterwards.</p>
+      <p>It also predates generative AI by decades. Modern systems evolved from older statistical speech-recognition methods to neural and Transformer-based models, with systems like Whisper making high-quality multilingual transcription much more accessible. Generative AI did not invent transcription. It mainly changed what products could do with the transcript afterwards.</p>
     </section>
 
     <section id="section-stakes">
@@ -497,7 +489,7 @@ ol.step-list li::before {
 
       <p>If Jessica's sentence is incorrectly attributed to Paul, the output can still sound completely reasonable. The business meaning, however, may be reversed: the vendor now appears to be proposing November instead of the customer.</p>
 
-      <p>A missing word is easy to notice, but a sentence attributed to the wrong person is harder to catch.</p>
+      <p>A missing sentence is easy to notice, but a sentence attributed to the wrong person is harder to catch.</p>
 
       <p>Every downstream insight inherits the mistakes made upstream. A better LLM cannot recover audio that was never captured, and perfect speech recognition cannot fix the wrong speaker attached to a sentence.</p>
 
@@ -510,17 +502,17 @@ ol.step-list li::before {
     </section>
 
     <section id="section-close">
-      <h2>When the transcript is wrong, where do you look?</h2>
+      <h2>When the transcript is wrong, where to look?</h2>
 
       <p>That brings us back to the original question: why does one transcript say Jessica while another says Speaker 2?</p>
 
       <p>The speech model may not be the problem at all. The issue could be how the audio was captured, whether speaker information survived, how diarization grouped the voices, or how identity was resolved.</p>
 
-      <p>That matters when you are debugging or improving a conversation-intelligence product. Before trying to improve the model, you need to understand which part of the pipeline actually failed.</p>
+      <p>This matters when debugging or improving a conversation-intelligence product. Before trying to improve a model, the product team needs to understand which part of the pipeline actually failed.</p>
 
       <p>Sometimes the fix is better transcription. Sometimes it is better diarization. And sometimes the real problem happened much earlier, when the audio or speaker metadata was captured.</p>
 
-      <p>To improve the output, you first need to know which layer to fix.</p>
+      <p>To improve the output and accuracy of any CI product, a product manager first needs to know which layer to fix. And this explainer is a map of all those layers - a simpler place to start.</p>
     </section>
 
   </main>
